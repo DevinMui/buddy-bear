@@ -11,6 +11,7 @@ const schema = mongoose.Schema(
             expected: String,
             file: String,
         },
+        points: Number,
     },
     {
         timestamps: true,
