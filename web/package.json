@@ -23,6 +23,7 @@
         "react-router-dom": "^5.2.0",
         "react-scripts": "4.0.3",
         "react-stylable-diff": "^2.0.0",
+        "react-webcam": "^5.2.3",
         "redux-thunk": "^2.3.0",
         "styled-components": "^5.2.1",
         "web-vitals": "^1.0.1"

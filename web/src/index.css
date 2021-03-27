@@ -42,6 +42,18 @@
     background-color: var(--grey-color);
 }
 
+video {
+    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 20px;
+    position: absolute;
+}
+
+.bg-color {
+    background-color: var(--background-color);
+}
+
 .primary-i {
     background-color: var(--primary-color);
 }
