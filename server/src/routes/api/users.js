@@ -91,4 +91,11 @@ router.get('/logout', (req, res) => {
     })
 })
 
+router.put('/', authenticate, async (req, res) => {
+    const user = await User.findByIdAndUpdate(req.user._id, req.body, {
+        new: true,
+    })
+    res.json({ status: 'success', data: user })
+})
+
 export default router
