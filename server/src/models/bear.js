@@ -2,13 +2,11 @@ import mongoose from 'mongoose'
 
 const schema = mongoose.Schema(
     {
-        email: String,
-        password: String,
-        points: Number 
+        user: String
     },
     {
         timestamps: true,
     }
 )
 
-export default mongoose.model('User', schema)
+export default mongoose.model('Bear', schema)

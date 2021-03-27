@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css'
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Link, Switch, Route } from 'react-router-dom'
 import _ from 'lodash'
@@ -6,6 +5,7 @@ import _ from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 import { login, logout } from '../redux/user'
 
+import Kids from './kids'
 import Home from './home'
 import CSSTest from './css-test'
 import { Login, Register } from './auth'
@@ -101,6 +101,9 @@ function App() {
                         </Route>
                         <Route exact path="/">
                             <Home />
+                        </Route>
+                        <Route exact path="/kids">
+                            <Kids />
                         </Route>
                     </>
                 ) : (
