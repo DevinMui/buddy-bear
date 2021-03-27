@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 
 import { ResponsiveLine } from '@nivo/line'
@@ -41,6 +42,18 @@ function Dash() {
             </div>
 
             <div className="container mt-4">
+                <div className="row">
+                    <div className="col-md-3">
+                        <Link to="/books" className="btn btn-new">
+                            <i
+                                className="bi bi-plus"
+                                // style={{
+                                //     fontSize: '64px',
+                                // }}
+                            />
+                        </Link>
+                    </div>
+                </div>
                 <p>You've lowered your garbage bill by $25</p>
                 <h2 className="text-center">$42</h2>
                 <div
