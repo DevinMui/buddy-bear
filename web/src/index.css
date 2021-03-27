@@ -173,6 +173,18 @@ a {
     border-radius: 20px;
 }
 
+.Difference > del {
+    background-color: rgb(255, 224, 224);
+    /* color: #fb420a; */
+    text-decoration: none;
+}
+
+.Difference > ins {
+    background-color: rgb(201, 238, 211);
+    /* color: #83f471; */
+    text-decoration: none;
+}
+
 @media only screen and (max-width: 600px) {
 }
 
