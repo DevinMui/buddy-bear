@@ -8,6 +8,10 @@ let router = express.Router()
 
 const upload = multer({ dest: 'uploads/' })
 
+router.get('/search', async (req, res) => {
+    
+})
+
 router.get('/', async (req, res) => {
     const books = await Book.find({ user: mongoose.ObjectId(req.user._id) })
     res.json({ status: 'success', data: books })
