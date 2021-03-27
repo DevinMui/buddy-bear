@@ -12,8 +12,9 @@
     text-decoration: none !important;
 }
 
-.card-i { /* As to not conflict with bootstrap */
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.33), -4px -4px 8px #FFFFFF;
+.card-i {
+    /* As to not conflict with bootstrap */
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.33), -4px -4px 8px #ffffff;
     border-radius: 20px;
     padding: 8px;
 }
@@ -21,13 +22,17 @@
 .card-ii {
     border-radius: 20px;
     padding: 8px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 4px 4px 8px rgba(0, 0, 0, 0.15);;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 4px 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .card-iii {
     border-radius: 20px;
     padding: 8px;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.33), -4px -4px 8px #FFFFFF;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.33), -4px -4px 8px #ffffff;
+}
+
+.background-i {
+    background-color: var(--background-color);
 }
 
 .primary-i {
@@ -140,6 +145,11 @@ a {
 
 .navbar .navbar-nav .nav-link:hover {
     transition: 0.25s all;
+}
+
+.mini-hero {
+    background-color: var(--primary-color);
+    padding: 50px;
 }
 
 @media only screen and (max-width: 600px) {
