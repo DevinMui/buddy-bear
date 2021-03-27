@@ -36,18 +36,17 @@ export default function () {
   // paw
   const camRef = useRef(null);
   const [cameraActive, setCameraActive] = useState(false);
-  const [isLandscape, setIsLandscape] = useState(true)
+  const [isLandscape, setIsLandscape] = useState(true);
 
   useEffect(() => {
-       const e = function() {
-        console.log(window.orientation)
-        setIsLandscape(window.orientation % 180 !== 0)
-    }
-    e()
+    const e = function () {
+      console.log(window.orientation);
+      setIsLandscape(window.orientation % 180 !== 0);
+    };
+    e();
     window.addEventListener("resize", e);
-    return window.removeEventListener('resize', e)
-    
-   }, [])
+    return window.removeEventListener("resize", e);
+  }, []);
 
   return (
     <Background>
@@ -57,18 +56,28 @@ export default function () {
       >
         <Paw src={require("./paw.svg").default} />
         <div
-          className={isLandscape? "col-4":'col-12'}
+          className={isLandscape ? "col-4" : "col-12"}
           style={{ paddingTop: "2rem", paddingBottom: "2rem" }}
         >
           <h1>Hello!</h1>
-          <h2>{isLandscape? 'Put me in your bear\'s paw.' : 'Rotate the phone to start reading.'}</h2>
+          <h2>
+            {isLandscape
+              ? "Put me in your bear's paw."
+              : "Rotate the phone to start reading."}
+          </h2>
         </div>
-        <div className="col-6 offset-5" style={{display: isLandscape ? 'block':'none'}}>
+        <div
+          className="col-6 offset-5"
+          style={{ display: isLandscape ? "block" : "none" }}
+        >
           <Preview className="card-i bg-color d-flex justify-content-center align-items-center">
             <Webcam
               ref={camRef}
               onUserMediaError={() => setCameraActive(false)}
               onUserMedia={() => setCameraActive(true)}
+              videoConstraints={{
+                facingMode: "environment",
+              }}
             />
             {cameraActive || (
               <CameraWarning>
