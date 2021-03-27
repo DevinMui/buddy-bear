@@ -58,6 +58,6 @@ if (config.NODE_ENV === 'production') {
     })
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Process is running on port ${PORT}`)
 })
