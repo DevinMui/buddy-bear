@@ -7,7 +7,7 @@ function Home() {
       style={{ paddingTop: 24, paddingBottom: 24, minHeight: "100%" }}
     >
       <div className="container">
-        <h2>Bear Project Name</h2>
+        <h2>Beary</h2>
         <div className="row">
           <div className="col-md-6 col-sm-12" style={{ padding: 24 }}>
             <h1 style={{ marginTop: "20%", marginBottom: "15%" }}>

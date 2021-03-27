@@ -2,13 +2,71 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import ImportContactsIcon from '@material-ui/icons/ImportContacts';
+import ScheduleIcon from '@material-ui/icons/Schedule';
+import StarIcon from '@material-ui/icons/Star';
+import {Row, Col, Container, Card, Button, CardDeck } from 'react-bootstrap';
+import { ResponsiveLine } from '@nivo/line';
+import marble from "./marble.jpg";
 
-import { ResponsiveLine } from '@nivo/line'
+class Book{
+    constructor(title, author, progress)
+    {
+        this.title = title;
+        this.author = author;
+        this.progress = progress;
+    }
+}
+
+let bookListFirst = [new Book("The Very Hungry Caterpillar", "Eric Carle", 87), 
+                new Book("Thomas the Tank Engine", "Jenny Lee", 12),
+                new Book("Matilda", "Roald Dahl", 21)];
 
 function Dash() {
     const [data, setData] = useState([])
-
+    const [bookList, setBookList] = useState(bookListFirst);
     const user = useSelector((state) => state.user)
+
+    function spawnBook(bookObj)
+    {
+        return(
+            <Card style={{ width: '18rem' }}>
+                <Card.Img variant="top" src={marble} />
+                <Card.Body>
+                    <Card.Title>{bookObj.title}</Card.Title>
+                    <Link to="/books/:id" className="btn btn-new">
+                        <i
+                            className=""
+                        />
+                    </Link>
+                </Card.Body>
+            </Card>
+        );
+    }
+
+    function spawnBookGroup(i)
+    {
+        return(
+            <CardDeck>
+                {spawnBook(bookList[i])}
+                {spawnBook(bookList[i+1])}
+                {spawnBook(bookList[i+2])}
+            </CardDeck>
+        );
+    }
+
+    function spawnBookList()
+    {
+        let returnBookList = [];
+        var i = 0;
+        for(i = 0; i < bookList.length; i++)
+        {
+            returnBookList.push(spawnBookGroup(i));
+            i++;
+            i++;
+        }
+        return returnBookList;
+    }
 
     useEffect(() => {
         // get data
@@ -37,13 +95,30 @@ function Dash() {
         <>
             <div className="mini-hero">
                 <div className="container">
-                    <h2>Hi {user.name},</h2>
+                    <Container>
+                        <Row style={{height:50}}></Row>
+                        <Row>
+                            <Col></Col>
+                            <Col>
+                                <ImportContactsIcon style={{fontSize:100}}/>
+                            </Col>
+                            <Col>
+                                <ScheduleIcon style={{fontSize:100}}/>
+                            </Col>
+                            <Col>
+                                <StarIcon style={{fontSize:100}}/>
+                            </Col>
+                            <Col></Col>
+                        </Row>
+                        <Row style={{height:150}}></Row>
+                    </Container>
                 </div>
             </div>
 
             <div className="container mt-4">
+
                 <div className="row">
-                    <div className="col-md-3">
+                    <div className="col-md-3" >
                         <Link to="/books" className="btn btn-new">
                             <i
                                 className="bi bi-plus"
@@ -53,10 +128,14 @@ function Dash() {
                             />
                         </Link>
                     </div>
+                    <div className="col-md-9">
+                        {spawnBookList()}
+                    </div>
                 </div>
-                <p>You've lowered your garbage bill by $25</p>
-                <h2 className="text-center">$42</h2>
-                <div
+
+                
+
+                {/* <div
                     style={{
                         height: '500px',
                         marginTop: '25px',
@@ -65,9 +144,7 @@ function Dash() {
                     }}
                 >
                     <LineGraph data={data} />
-                </div>
-                <h2>Resources</h2>
-                <p>Learn how to go zero-waste</p>
+                </div> */}
             </div>
         </>
     )

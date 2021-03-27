@@ -1,3 +1,7 @@
 export default function CreateBook() {
-    return <></>
+    return (
+        <div>
+            creating a book
+        </div>
+    );
 }
