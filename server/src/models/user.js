@@ -2,9 +2,10 @@ import mongoose from 'mongoose'
 
 const schema = mongoose.Schema(
     {
+        name: String,
         email: String,
         password: String,
-        points: Number 
+        points: Number,
     },
     {
         timestamps: true,

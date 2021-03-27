@@ -1,16 +1,12 @@
 export default function Book(props) {
     return (
         <div
-            className="row card-i background-i no-gutters"
-            style={{ padding: 0 }}
+            className="row card-i background-i no-gutters col-md-6 col-sm-12"
+            style={{ padding: 0, overflow: 'hidden' }}
         >
-            <div className="col-md-4">
+            <div className="col-md-4 d-flex justify-content-center align-items-center">
                 <img
                     className="img-fluid"
-                    style={{
-                        marginLeft: '-8px',
-                        borderRadius: '20px',
-                    }}
                     src={props.src}
                     alt={props.title}
                 />
