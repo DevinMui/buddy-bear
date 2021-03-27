@@ -16,6 +16,7 @@ const schema = mongoose.Schema(
                 enum: ['SYNTHESIZED', 'RECORDED'],
                 default: 'SYNTHESIZED',
             },
+            files: [{}],
         },
         mode: {
             type: String,
