@@ -22,12 +22,17 @@ function Book() {
             page = <Statistics />
             break
         case 1:
-            page = <Trouble />
-            break
-        case 2:
             page = <Comparison />
             break
+        case 2:
+            page = <Trouble />
+            break
+        // case 2:
+        //     page = <Comparison />
+        //     break
         default:
+            page = <></>
+            break
     }
 
     return (
@@ -44,7 +49,37 @@ function Book() {
                     </div>
                 </div>
             </div>
-            <div className="container">{page}</div>
+            <div className="container mt-4">
+                <ul className="nav">
+                    <li className="nav-item">
+                        <button
+                            className="btn btn-link"
+                            onClick={() => setPageIndex(0)}
+                        >
+                            Statistics
+                        </button>
+                    </li>
+                    {/*
+                    <li className="nav-item">
+                        <button
+                            className="btn btn-link"
+                            onClick={() => setPageIndex(1)}
+                        >
+                            Trouble Spots
+                        </button>
+                    </li>
+                    */}
+                    <li className="nav-item">
+                        <button
+                            className="btn btn-link"
+                            onClick={() => setPageIndex(1)}
+                        >
+                            Comparison
+                        </button>
+                    </li>
+                </ul>
+                {page}
+            </div>
         </>
     )
 }
