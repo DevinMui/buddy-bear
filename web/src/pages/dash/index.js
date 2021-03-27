@@ -33,23 +33,30 @@ function Dash() {
     }, [])
 
     return (
-        <div className="container">
-            <h2>Hi {user.name},</h2>
-            <p>You've lowered your garbage bill by $25</p>
-            <h2 className="text-center">$42</h2>
-            <div
-                style={{
-                    height: '500px',
-                    marginTop: '25px',
-                    padding: '25px',
-                    background: 'rgba(196, 196, 196, 0.1)',
-                }}
-            >
-                <LineGraph data={data} />
+        <>
+            <div className="mini-hero">
+                <div className="container">
+                    <h2>Hi {user.name},</h2>
+                </div>
             </div>
-            <h2>Resources</h2>
-            <p>Learn how to go zero-waste</p>
-        </div>
+
+            <div className="container mt-4">
+                <p>You've lowered your garbage bill by $25</p>
+                <h2 className="text-center">$42</h2>
+                <div
+                    style={{
+                        height: '500px',
+                        marginTop: '25px',
+                        padding: '25px',
+                        background: 'rgba(196, 196, 196, 0.1)',
+                    }}
+                >
+                    <LineGraph data={data} />
+                </div>
+                <h2>Resources</h2>
+                <p>Learn how to go zero-waste</p>
+            </div>
+        </>
     )
 }
 

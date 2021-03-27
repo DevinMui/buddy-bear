@@ -123,8 +123,11 @@ a {
 
 /* BEGIN NAV BAR STYLES */
 
+.navbar {
+    background-color: var(--primary-color);
+}
+
 .navbar .navbar-brand {
-    margin-left: 60px;
     margin-right: 80px;
     font-size: 36px;
     font-weight: 700;
