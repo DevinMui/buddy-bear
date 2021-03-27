@@ -102,9 +102,6 @@ function App() {
                         <Route exact path="/">
                             <Home />
                         </Route>
-                        <Route exact path="/kids">
-                            <Kids />
-                        </Route>
                     </>
                 ) : (
                     <>
@@ -117,6 +114,9 @@ function App() {
                         </Route>
                         <Route exact path="/">
                             <Dash />
+                        </Route>
+                        <Route exact path="/kids/:book_id">
+                            <Kids />
                         </Route>
                     </>
                 )}
