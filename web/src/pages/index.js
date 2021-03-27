@@ -6,12 +6,13 @@ import _ from "lodash";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../redux/user";
 
-import Home from "./home";
-import CSSTest from "./css-test";
-import { Login, Register } from "./auth";
-import Dash from "./dash";
-import Setup from "./setup";
 import Kids from "./kids";
+import Home from './home'
+import CSSTest from './css-test'
+import { Login, Register } from './auth'
+import Dash from './dash'
+import Book from './book'
+import CreateBook from './create-book'
 
 function App() {
   const dispatch = useDispatch();
@@ -21,35 +22,40 @@ function App() {
     dispatch(login({}));
   }, []);
 
-  return (
-    <Router>
-      {_.isEmpty(user) === true ? (
-        <Switch>
-          <Route exact path="/login">
-            <Login />
-          </Route>
-          <Route exact path="/css-test">
-            <CSSTest />
-          </Route>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route exact path="/kids">
-            <Kids />
-          </Route>
-        </Switch>
-      ) : (
-        <Switch>
-          <Route exact path="/">
-            <Dash />
-          </Route>
-          <Route exact path="/setup">
-            <Setup />
-          </Route>
-        </Switch>
-      )}
-    </Router>
-  );
+    return (
+        <Router>
+            <Switch>
+                {_.isEmpty(user) === true ? (
+                    <>
+                        <Route exact path="/login">
+                            <Login />
+                        </Route>
+                        <Route exact path="/register">
+                            <Register />
+                        </Route>
+                        <Route exact path="/css-test">
+                            <CSSTest />
+                        </Route>
+                        <Route exact path="/">
+                            <Home />
+                        </Route>
+                    </>
+                ) : (
+                    <>
+                        <Route exact path="/books">
+                            <CreateBook />
+                        </Route>
+                        <Route exact path="/books/:id">
+                            <Book />
+                        </Route>
+                        <Route exact path="/">
+                            <Dash />
+                        </Route>
+                    </>
+                )}
+            </Switch>
+        </Router>
+    )
 }
 
 export default App;
