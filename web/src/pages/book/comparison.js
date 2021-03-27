@@ -1,6 +1,17 @@
+import { useEffect, useState } from 'react'
 import Diff from 'react-stylable-diff'
 
 export default function Comparison() {
+    const [page, setPage] = useState({})
+
+    useEffect(() => {})
+
+    function play() {}
+
+    function prevPage() {}
+
+    function nextPage() {}
+
     return (
         <div className="mt-4">
             <div className="row">
@@ -14,8 +25,8 @@ export default function Comparison() {
                                 type="words"
                             />
                         </p>
-                        <button className="btn play">
-                            <i className="bi bi-play-fill"></i>
+                        <button className="btn play" onClick={play}>
+                            <i className="bi bi-play-fill" />
                         </button>
                     </div>
                 </div>
@@ -34,10 +45,14 @@ export default function Comparison() {
             </div>
             <div className="mt-4">
                 <div className="float-left">
-                    <button className="btn btn-link">Previous Page</button>
+                    <button className="btn btn-link" onClick={prevPage}>
+                        Previous Page
+                    </button>
                 </div>
                 <div className="float-right">
-                    <button className="btn btn-link">Next Page</button>
+                    <button className="btn btn-link" onClick={nextPage}>
+                        Next Page
+                    </button>
                 </div>
             </div>
         </div>
