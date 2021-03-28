@@ -49,6 +49,8 @@ function Book() {
             break
     }
 
+    useEffect(() => window.scrollTo(0, 0), [])
+    
     return (
         <>
             <div className="mini-hero">
@@ -63,10 +65,16 @@ function Book() {
                     </div>
                 </div>
             </div>
-            <div className="container mt-4">
+            <div className="container mt-4 pb-5">
                 <ul className="nav">
                     <li className="nav-item">
                         <button
+                            style={{
+                                color:
+                                    pageIndex === 0
+                                        ? 'var(--accent-color)'
+                                        : 'var(--text-color)',
+                            }}
                             className="btn btn-link"
                             onClick={() => setPageIndex(0)}
                         >
@@ -85,6 +93,12 @@ function Book() {
                     */}
                     <li className="nav-item">
                         <button
+                            style={{
+                                color:
+                                    pageIndex === 1
+                                        ? 'var(--accent-color)'
+                                        : 'var(--text-color)',
+                            }}
                             className="btn btn-link"
                             onClick={() => setPageIndex(1)}
                         >
