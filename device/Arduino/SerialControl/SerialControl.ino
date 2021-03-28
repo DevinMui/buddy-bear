@@ -1,16 +1,22 @@
 #include <Servo.h>
+#include <Adafruit_ST7735.h>
+#include <Adafruit_GFX.h>
 #include <AceButton.h>
-using namespace ace_button;
 
 #include "ServoConfiguration.h"
 #include "Keyframe.h"
 #include "Routines.h"
 #include "SerialProtocol.h"
 
+#include "bitmaps.h"
+
+using namespace ace_button;
+
+
 /**
    Pin number definitions
 */
-const short PIN_RIGHT_PAN = 8;
+const short PIN_RIGHT_PAN = 14;
 const short PIN_RIGHT_TILT = 9;
 const short PIN_LEFT_PAN = 10;
 const short PIN_LEFT_TILT = 11;
@@ -20,6 +26,12 @@ const short PIN_HEAD_TILT = 13;
 const short PIN_VIBRATION = 2;
 const short PIN_TOUCH = 3;
 
+const short PIN_TFT_CS = 5;
+const short PIN_TFT_DC = 6;
+const short PIN_TFT_RST = 7;
+const short PIN_TFT_SDA = 20;
+const short PIN_TFT_SCK = 21;
+
 /**
    Device initialization
 */
@@ -27,6 +39,8 @@ Servo rightPanServo, rightTiltServo, leftPanServo, leftTiltServo, headPanServo, 
 const Servo* SERVOS[6] = {&rightPanServo, &rightTiltServo, &leftPanServo, &leftTiltServo, &headPanServo, &headTiltServo};
 
 AceButton button{PIN_TOUCH};
+
+Adafruit_ST7735 tft = Adafruit_ST7735(PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_SDA, PIN_TFT_SCK, PIN_TFT_RST);
 
 /**
    Move all servos based on desired angles, synchronized to take specified durations
@@ -93,10 +107,22 @@ void sendMessage(String msg) {
 
 void handleButton(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   switch (eventType) {
-    case AceButton::kEventPressed:
+    case AceButton::kEventReleased:
       sendMessage(ARDUINO_NOTIFICATION_BUTTON);
       break;
   }
+}
+
+void displayIronman() {
+  tft.setCursor(3, 100);
+  tft.setTextColor(ST77XX_WHITE, ST77XX_RED);
+  tft.setTextSize(2);
+  tft.print("Good work!");
+  tft.drawRGBBitmap(0, 0, ironman, 128, 72);
+}
+
+void displayClear() {
+  tft.fillScreen(ST77XX_BLACK);
 }
 
 /**
@@ -118,13 +144,19 @@ void setup() {
   pinMode(PIN_VIBRATION, OUTPUT);
 
   // Set up capacitive touch sensor
-  pinMode(PIN_TOUCH, INPUT);
+  pinMode(PIN_TOUCH, INPUT_PULLUP);
   button.setEventHandler(handleButton);
 
+  // Set up TFT LCD
+  tft.initR(INITR_BLACKTAB);
+  tft.setRotation(ST7735_MADCTL_BGR);
+  
   // Default all servos to 90 degrees
   for (auto servo : SERVOS) {
     servo->write(90);
   }
+
+  tft.fillScreen(ST7735_BLACK);
 }
 
 /**
@@ -145,7 +177,9 @@ void loop() {
 
     } else if (ARDUINO_COMMAND_DANCE.equals(command)) {
       sendMessage(ARDUINO_ACK_SUCCESS);
+      displayIronman();
       runRoutine(danceRoutine);
+      displayClear();
 
     } else if (ARDUINO_COMMAND_BUZZ.equals(command)) {
       sendMessage(ARDUINO_ACK_SUCCESS);

@@ -40,7 +40,7 @@ def disconnect():
 
 
 ser = serial.Serial(
-    port='/dev/ttyACM0', 
+    port='/dev/ttyACM1', 
     baudrate = 9600,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
@@ -52,6 +52,7 @@ current_state = STATE_OFF
 lock = threading.Lock()
 
 def send_arduino_command(command):
+    print(f"Sending: {command}")
     command = command.encode("utf-8")
     ser.write(command)
     ack = b""
@@ -66,6 +67,7 @@ def send_arduino_command(command):
 
 def handle_arduino_notification(notification):
     notification = notification.decode("utf-8")
+    print(f"Received: {notification}")
     if ARDUINO_NOTIFICATION_BUTTON in notification:
         handle_event(EVENT_BUTTON)
     else:

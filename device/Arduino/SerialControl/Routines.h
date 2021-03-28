@@ -51,6 +51,17 @@ Keyframe danceKeyframes[] = {
   Keyframe(500, KeyframeAngles::WIGGLE_RIGHT),
   Keyframe(500, KeyframeAngles::WIGGLE_MID),
   Keyframe(500, KeyframeAngles::WIGGLE_LEFT),
+
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  Keyframe(500, KeyframeAngles::WIGGLE_RIGHT),
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  Keyframe(500, KeyframeAngles::WIGGLE_LEFT),
+
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  Keyframe(500, KeyframeAngles::WIGGLE_RIGHT),
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  Keyframe(500, KeyframeAngles::WIGGLE_LEFT),
+
   Keyframe(500, KeyframeAngles::WIGGLE_MID),
   
   Keyframe(500, KeyframeAngles::ZEROES),
