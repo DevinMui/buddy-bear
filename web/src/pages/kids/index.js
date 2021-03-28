@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Speech from 'speak-tts'
-import io from 'socket.io-client'
+import socket from '../../socket'
 
 const Background = styled.div`
     background: var(--primary-color);
@@ -49,7 +49,6 @@ export default function Kid() {
     // camera
     // paw
     const { id, judge } = useParams()
-    const [socket, setSocket] = useState(io.connect())
     const camRef = useRef(null)
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
@@ -77,15 +76,6 @@ export default function Kid() {
             setIsPortrait(window.innerHeight > window.innerWidth)
         }
         e()
-        window.addEventListener('resize', e)
-
-        //socket shiz
-        socket.on('scan', () => {
-            // either with send()
-            console.log('socket on')
-        })
-
-        return window.removeEventListener('resize', e)
     }, [])
 
     console.log(transcript)
