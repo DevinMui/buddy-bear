@@ -93,7 +93,7 @@ export default function CreateBook() {
                         title: titleStr,
                         author: authorStr,
                         description: descriptionStr,
-                        src: srcStr,
+                        image: srcStr,
                     })
                 }
                 setBooks([...empty])
