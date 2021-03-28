@@ -30,6 +30,8 @@
         "react-stylable-diff": "^2.0.0",
         "react-webcam": "^5.2.3",
         "redux-thunk": "^2.3.0",
+        "speak-tts": "^2.0.8",
+        "socket.io-client": "^4.0.0",
         "styled-components": "^5.2.1",
         "uuid": "^8.3.2",
         "web-vitals": "^1.0.1"

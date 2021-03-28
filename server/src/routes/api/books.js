@@ -35,7 +35,6 @@ router.post('/', upload.array('audio'), async (req, res, next) => {
         let body = req.body
         if (req.files) body.audio = { files: req.files, mode: 'RECORDED' }
         body.user = req.user._id
-        console.log(body)
         const book = await new Book(req.body).save()
         res.json({ status: 'success', data: book })
     } catch (e) {
