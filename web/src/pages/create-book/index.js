@@ -85,7 +85,7 @@ export default function CreateBook() {
                               '...'
                             : 'no description available'
                     let srcStr =
-                        booky['imageLinks']['thumbnail'] !== undefined
+                        booky['imageLinks'] !== undefined
                             ? booky['imageLinks']['thumbnail']
                             : ''
 
@@ -93,7 +93,7 @@ export default function CreateBook() {
                         title: titleStr,
                         author: authorStr,
                         description: descriptionStr,
-                        src: srcStr,
+                        image: srcStr,
                     })
                 }
                 setBooks([...empty])

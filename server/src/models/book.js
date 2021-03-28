@@ -6,7 +6,7 @@ const schema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
         },
-        name: String,
+        title: String,
         author: String,
         description: String,
         image: String,
