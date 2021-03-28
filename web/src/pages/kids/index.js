@@ -3,6 +3,8 @@ import { Button } from 'react-bootstrap'
 import styled from 'styled-components'
 import Webcam from 'react-webcam'
 import axios from 'axios'
+import { v4 as uuid } from 'uuid'
+import { useParams } from 'react-router-dom'
 
 const Background = styled.div`
     background: var(--primary-color);
@@ -35,16 +37,25 @@ const CameraWarning = styled.div`
     opacity: 0.8;
     text-align: center;
 `
+const MicRecorder = require('mic-recorder-to-mp3')
 
 export default function () {
     // Put some warnings here for rotation
     // text
     // camera
     // paw
+    const { id } = useParams()
     const camRef = useRef(null)
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
     const [isPortrait, setIsPortrait] = useState(true)
+    const [isRecording, setIsRecording] = useState(false)
+    const [currFile, setCurrFile] = useState({
+        isRecording: false,
+        file: null,
+    })
+    const [files, setFiles] = useState([])
+    const [recorder, setRecorder] = useState(null)
 
     useEffect(() => {
         const e = function () {
@@ -53,11 +64,75 @@ export default function () {
                 setIsPortrait(window.orientation % 180 === 0)
             setIsPortrait(window.innerHeight > window.innerWidth)
         }
+        if (!recorder) setRecorder(new MicRecorder({ bitRate: 128 }))
         e()
         window.addEventListener('resize', e)
         return window.removeEventListener('resize', e)
     }, [])
 
+    const record = () => {
+        const error = () => {
+            setCurrFile({ file: null, isRecording: false })
+        }
+        if (!recorder) return error()
+        if (!currFile.isRecording) {
+            recorder
+                .start()
+                .then(() => setCurrFile({ file: null, isRecording: true }))
+                .catch(error)
+        } else {
+            recorder
+                .stop()
+                .getMp3()
+                .then(([buffer, blob]) => {
+                    // do what ever you want with buffer and blob
+                    // Example: Create a mp3 file and play
+
+                    const file = new File(buffer, `page-${uuid()}.mp3`, {
+                        type: blob.type,
+                        lastModified: Date.now(),
+                    })
+                    console.log(file)
+                    let c = {
+                        expected: '',
+                        recorded: '',
+                    }
+                    const d = new FormData()
+                    d.append('audio', file)
+                    d.append('text', JSON.stringify(c))
+
+                    axios.post(`/api/books/${id}/pages`, d).then(
+                        (response) => {
+                            console.log('it returned or something')
+                            console.log(response)
+                        },
+                        (error) => {
+                            console.log(error)
+                        }
+                    )
+
+                    setCurrFile({
+                        file: null,
+                        isRecording: false,
+                    })
+                    // const player = new Audio(URL.createObjectURL(file))
+                    // player.play()
+                })
+                .catch(error)
+        }
+    }
+
+    function recordingToggle() {
+        if (currFile.isRecording) {
+            //is recording
+            console.log('end recording')
+            record()
+        } else {
+            console.log('start recording')
+            setCurrFile({ file: null, isRecording: false })
+            record()
+        }
+    }
     const capture = useCallback(() => {
         const imageSrc = camRef.current.getScreenshot()
         console.log(imageSrc)
@@ -100,9 +175,12 @@ export default function () {
                     <div
                         className="card-i text-center mt-5"
                         onClick={() => window.location.reload()}
-                        style={{ cursor: 'pointer' , visibility: isPortrait? 'hidden': 'inherit'}}
+                        style={{
+                            cursor: 'pointer',
+                            visibility: isPortrait ? 'hidden' : 'inherit',
+                        }}
                     >
-                        <h3 >Okay!</h3>
+                        <h3>Okay!</h3>
                     </div>
                 </div>
 
@@ -123,6 +201,7 @@ export default function () {
                         )}
                     </Preview>
                 </div>
+
                 <Button
                     onClick={capture}
                     style={{
@@ -132,6 +211,17 @@ export default function () {
                     }}
                 >
                     Press to Take Screenshot
+                </Button>
+
+                <Button
+                    onClick={recordingToggle}
+                    style={{
+                        display: isPortrait ? 'block' : 'none',
+                        position: 'fixed',
+                        zIndex: 99,
+                    }}
+                >
+                    Record
                 </Button>
             </div>
         </Background>
