@@ -85,7 +85,7 @@ export default function CreateBook() {
                               '...'
                             : 'no description available'
                     let srcStr =
-                        booky['imageLinks']['thumbnail'] !== undefined
+                        booky['imageLinks'] !== undefined
                             ? booky['imageLinks']['thumbnail']
                             : ''
 

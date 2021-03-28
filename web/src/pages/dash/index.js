@@ -69,7 +69,15 @@ function Dash() {
 
             setData(parsedData)
         }
-        getData()
+
+        const getBooks = async () => {
+            const booky = await axios.get('/api/books')
+            console.log("BOOKS");
+            console.log(booky);
+            setBookList([...booky["data"]["data"]])
+        }
+        getData();
+        getBooks();
     }, [])
 
     return (
