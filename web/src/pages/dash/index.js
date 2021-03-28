@@ -172,13 +172,16 @@ function Dash() {
             <div className="container mt-4 pb-4">
                 <div className="row d-flex align-items-center">
                     <div className="col-12 col-md-3 text-center">
-                        <Link to="/books" className="btn btn-new">
-                            <i
-                                className="bi bi-plus"
-                                style={{
-                                    fontSize: '64px',
-                                }}
-                            />
+                        <Link to="/books" style={{ color: 'inherit' }}>
+                            <div to="/books" className="btn btn-new">
+                                <i
+                                    className="bi bi-plus"
+                                    style={{
+                                        fontSize: '64px',
+                                    }}
+                                />
+                            </div>
+                            <h3 className="my-4">Add a book</h3>
                         </Link>
                     </div>
                     {spawnBookList()}
