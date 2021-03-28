@@ -14,6 +14,21 @@ ser = serial.Serial(
 
 sio = socketio.Client()
 
+ARDUINO_TIMEOUT = 2
+
+def send_arduino_command(command):
+    ser.write(command)
+    ser.readline(ARDUINO_TIMEOUT)
+
+def scan_page():
+    send_arduino_command("SCAN")
+
+def wave():
+    send_arduino_command("WAVE")
+
+def dance():
+    send_arduino_command("DANCE")
+
 @sio.event
 def connect():
     print('connection established')

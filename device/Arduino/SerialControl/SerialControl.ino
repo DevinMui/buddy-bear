@@ -4,8 +4,8 @@
 #include "Routines.h"
 
 /**
- * Pin number definitions
- */
+   Pin number definitions
+*/
 const short PIN_RIGHT_PAN = 8;
 const short PIN_RIGHT_TILT = 9;
 const short PIN_LEFT_PAN = 10;
@@ -17,11 +17,14 @@ const short PIN_TOUCH = 2;
 const short PIN_VIBRATION = 13;
 
 /**
- * Servo initialization
- */
+   Servo initialization
+*/
 Servo rightPanServo, rightTiltServo, leftPanServo, leftTiltServo, headPanServo, headTiltServo;
 const Servo* SERVOS[6] = {&rightPanServo, &rightTiltServo, &leftPanServo, &leftTiltServo, &headPanServo, &headTiltServo};
 
+/**
+   Move all servos based on desired angles, synchronized to take specified durations
+*/
 void glide(short* targetAngles, int duration, int step = 10) {
   float currentAngles[6];
   float stepSizes[6];
@@ -60,9 +63,9 @@ void glide(short* targetAngles, int duration, int step = 10) {
   }
 }
 
-
-
-
+/**
+ * Run a specified routine
+ */
 void runRoutine(const Routine& routine) {
   auto keyframes = routine.GetKeyframes();
   auto keyframesLength = routine.GetNumKeyframes();
@@ -80,6 +83,9 @@ void runRoutine(const Routine& routine) {
   glide(KeyframeAngles::ZEROES, 1000);
 }
 
+/**
+ * Setup
+ */
 void setup() {
 
   Serial.begin(9600);
@@ -92,15 +98,15 @@ void setup() {
   headPanServo.attach(PIN_HEAD_PAN);
   headTiltServo.attach(PIN_HEAD_TILT);
 
-  rightPanServo.write(90);
-  rightTiltServo.write(90);
-  leftPanServo.write(90);
-  leftTiltServo.write(90);
-  headPanServo.write(90);
-  headTiltServo.write(90);
-
+  // Default all servos to 90 degrees
+  for (auto servo : SERVOS) {
+    servo->write(90);
+  }
 }
 
+/**
+ * Loop
+ */
 void loop() {
   Serial.println("Rt Pan: 1\t Rt Tilt: 2\t Lt Pan: 3\t Lt Tilt: 4\t Hd Pan: 5\t Hd Tilt: 6");
   Serial.print("Enter joint to control (1-6) OR 0 for Routines: ");
