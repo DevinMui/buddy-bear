@@ -16,4 +16,5 @@ def disconnect():
     print('disconnected from server')
 
 sio.connect('http://localhost:5000')
+sio.send("hi")
 sio.wait()
