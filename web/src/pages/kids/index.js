@@ -48,23 +48,25 @@ export default function Kid() {
     // camera
     // paw
     const { id, judge } = useParams()
-    const socket = io.connect()
+    // const [socket, setSocket] = useState(io.connect())
+    const [socket, setSocket] = useState(undefined)
     const camRef = useRef(null)
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
     const [isPortrait, setIsPortrait] = useState(true)
-    const [currFile, setCurrFile] = useState({
-        isRecording: false,
-        file: null,
-    })
-    const [recorder, setRecorder] = useState(null)
+    const [recorder, setRecorder] = useState(new MicRecorder({ bitRate: 128 }))
     const [speech, setSpeech] = useState(null)
-    const [speechResults, setSpeechResults] = useState('')
+    const [speechResults, setSpeechResults] = useState('b')
     const [ocrResults, setOcrResults] = useState('')
-    const [interim, setInterim] = useState('')
+    const [interim, setInterim] = useState('a')
 
     const [butt, setButt] = useState(false)
-    const [tts, setTts] = useState(null)
+    const [tts, setTts] = useState(new Speech())
+    const [recog, setRecog] = useState(false)
+
+    useEffect(() => {
+        tts.init()
+    }, [])
 
     useEffect(() => {
         if (speech) return
@@ -75,23 +77,24 @@ export default function Kid() {
         const recognition = new speechRecognition()
         recognition.continuous = true
         recognition.interimResults = true
-        recognition.onresult = function (event) {
-            for (var i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    // console.log('final', event.results[i][0].transcript)
-                    setSpeechResults(
-                        speechResults + event.results[i][0].transcript
-                    )
-                } else {
-                    // console.log('interim', event.results[i][0].transcript)
-                    setInterim(event.results[i][0].transcript)
-                }
-            }
-        }
+        recognition.onresult = newFn 
+
+        if (recog) return
+
         recognition.start()
         setSpeech(recognition)
-    })
+        setRecog(false)
+    }, [])
+    const newFn = (event) => {
+        console.log('f',interim, speechResults)
+        if (event.results[0].isFinal) {
+            setSpeechResults(speechResults + event.results[0][0].transcript)
+        } else {
+            console.log('interim', event.results[0][0].transcript)
+            setInterim(event.results[0][0].transcript)
+        }
 
+    }
     useEffect(() => {
         const e = function () {
             console.log(window.orientation)
@@ -99,31 +102,27 @@ export default function Kid() {
                 setIsPortrait(window.orientation % 180 === 0)
             setIsPortrait(window.innerHeight > window.innerWidth)
         }
-        //socket shiz
-        socket.on('scan', () => {
-            // either with send()
-            console.log('socket on')
-        })
-
-        if (!recorder) setRecorder(new MicRecorder({ bitRate: 128 }))
         e()
         window.addEventListener('resize', e)
+
+        //socket shiz
+        // socket.on('scan', () => {
+        //     // either with send()
+        //     console.log('socket on')
+        // })
+
         return window.removeEventListener('resize', e)
     }, [])
 
-    const record = () => {
-        const error = () => {
-            setCurrFile({ file: null, isRecording: false })
-        }
-        if (!recorder) return error()
-        if (!currFile.isRecording) {
-            recorder
-                .start()
-                .then(() => setCurrFile({ file: null, isRecording: true }))
-                .catch(error)
+    const record = (isStart) => {
+        if (!recorder) return console.log('no recorder')
+
+        if (isStart) {
+            recorder.start().catch((e) => console.log(e))
             // Clear speech results
             setSpeechResults('')
             setInterim('')
+            console.log('start')
         } else {
             recorder
                 .stop()
@@ -141,7 +140,7 @@ export default function Kid() {
                     console.log(speechResults + ' ' + interim)
                     let c = {
                         expected: ocrResults,
-                        recorded: speechResults + ' ' + interim,
+                        recorded: [speechResults, interim].join(' '),
                     }
                     const d = new FormData()
                     d.append('audio', file)
@@ -157,27 +156,10 @@ export default function Kid() {
                         }
                     )
 
-                    setCurrFile({
-                        file: null,
-                        isRecording: false,
-                    })
                     // const player = new Audio(URL.createObjectURL(file))
                     // player.play()
                 })
-                .catch(error)
-        }
-    }
-
-    function recordingToggle() {
-        setButt(false)
-        if (currFile.isRecording) {
-            //is recording
-            console.log('end recording')
-            record()
-        } else {
-            console.log('start recording')
-            setCurrFile({ file: null, isRecording: false })
-            record()
+                .catch((e) => console.error(e))
         }
     }
 
@@ -191,8 +173,12 @@ export default function Kid() {
 
     const capture = useCallback(() => {
         const imageSrc = camRef.current.getScreenshot()
-        console.log(imageSrc)
         if (tts) tts.cancel()
+        try {
+            record(false)
+        } catch (e) {
+            console.log(e)
+        }
         axios
             .post('/api/bears/ocr/', {
                 file: imageSrc,
@@ -202,40 +188,28 @@ export default function Kid() {
                     try {
                         console.log(response)
                         console.log('it returned or something')
-                        const e = response.data.data[0].description
+                        const e = response.data.data[0]
+                            ? response.data.data[0].description
+                            : ''
                         console.log(e)
                         // will throw an exception if not browser supported
-                        ;(function () {
-                            const speech = new Speech()
-                            if (!speech.hasBrowserSupport()) {
-                                // returns a boolean
-                                console.log('no tts supprot')
-                                return // toast('Error initializing text-to-speech')
-                            }
-                            setTts(speech)
-                            speech
-                                .init()
-                                .then(() => {
-                                    // The "data" object contains the list of available voices and the voice synthesis params
-                                    console.log('init ok')
-                                    // toast('Error initializing text-to-speech')
+                        if (e) {
+                            ;(function () {
+                                setButt(true)
+                                tts.speak({
+                                    text: e,
+                                    listeners: {
+                                        onend: () => record(true),
+                                    },
                                 })
-                                .catch((e) => {
-                                    console.error(
-                                        'An error occured while initializing : ',
-                                        e
-                                    )
-                                })
-                            setButt(true)
-                            speech.speak({
-                                text: e,
-                                listeners: {
-                                    onend: recordingToggle,
-                                },
-                            })
-                        })()
+                            })()
+                        } else {
+                            record(true)
+                        }
                         setOcrResults(e)
-                    } catch (e) {}
+                    } catch (e) {
+                        console.log(e)
+                    }
                 },
                 (error) => {
                     console.log(error)
@@ -295,7 +269,6 @@ export default function Kid() {
                 </div>
 
                 <Button
-                    class="card-i"
                     onClick={capture}
                     style={{
                         display: judge ? 'none' : 'block',
@@ -304,25 +277,13 @@ export default function Kid() {
                         left: 0,
                         zIndex: 99,
                     }}
-                    disabled={butt}
+                    disabled={false && butt}
                 >
                     Simulate Bear Pat
                 </Button>
 
                 <Button
-                    onClick={recordingToggle}
-                    style={{
-                        display: 'none',
-                        position: 'fixed',
-                        zIndex: 99,
-                    }}
-                >
-                    Record
-                </Button>
-
-                <Button
                     onClick={giveReward}
-                    class="card-i"
                     style={{
                         display: judge ? 'none' : 'block',
                         position: 'fixed',
