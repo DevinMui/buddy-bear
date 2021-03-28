@@ -79,6 +79,7 @@ html {
     width: 100%;
     scroll-behavior: smooth;
     transition: box-shadow 0.25s;
+    transition: color 0.25s;
 }
 
 html,

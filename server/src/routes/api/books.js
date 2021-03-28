@@ -1,12 +1,25 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import multer from 'multer'
+import crypto from 'crypto'
+import mime from 'mime-types'
 import Book from '../../models/book'
 import Page from '../../models/page'
 
 let router = express.Router()
 
-const upload = multer({ dest: 'uploads/' })
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => {
+        crypto.pseudoRandomBytes(16, function (err, raw) {
+            if (err) return cb(err)
+
+            cb(null, `${raw.toString('hex')}.${mime.extension(file.mimetype)}`)
+        })
+    },
+})
+
+const upload = multer({ storage: storage })
 
 router.get('/', async (req, res, next) => {
     try {
@@ -21,7 +34,8 @@ router.get('/', async (req, res, next) => {
 router.post('/', upload.array('audio'), async (req, res, next) => {
     try {
         let body = req.body
-        body.audio.files = req.files
+        if(req.files)
+            body.audio = {files: req.files, mode: 'RECORDED'} 
         const book = await new Book(req.body).save()
         res.json({ status: 'success', data: book })
     } catch (e) {
