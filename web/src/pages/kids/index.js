@@ -1,4 +1,6 @@
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import SpeechRecognition, {
+    useSpeechRecognition,
+} from 'react-speech-recognition'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Button } from 'react-bootstrap'
 import styled from 'styled-components'
@@ -79,15 +81,10 @@ export default function Kid() {
     }, [])
 
     console.log(transcript)
-    const record = (isStart) => {
+    const record = () => {
+        console.log('t', transcript)
         if (!recorder) return console.log('no recorder')
-
-        if (isStart) {
-            recorder.start().catch((e) => console.log(e))
-            // Clear speech results
-            resetTranscript()
-            console.log('start')
-        } else {
+        try {
             recorder
                 .stop()
                 .getMp3()
@@ -105,6 +102,7 @@ export default function Kid() {
                         expected: ocrResults,
                         recorded: transcript,
                     }
+                    console.log('c', c)
                     const d = new FormData()
                     d.append('audio', file)
                     d.append('text', JSON.stringify(c))
@@ -123,7 +121,19 @@ export default function Kid() {
                     // player.play()
                 })
                 .catch((e) => console.error(e))
+        } catch (e) {
+            console.log(e)
         }
+        recorder
+            .start()
+            .then(() => {
+                console.log('started')
+                resetTranscript()
+            })
+            .catch((e) => console.log(e))
+        // Clear speech results
+
+        setButt(false)
     }
 
     function join() {
@@ -137,11 +147,6 @@ export default function Kid() {
     const capture = useCallback(() => {
         const imageSrc = camRef.current.getScreenshot()
         if (tts) tts.cancel()
-        try {
-            record(false)
-        } catch (e) {
-            console.log(e)
-        }
         axios
             .post('/api/bears/ocr/', {
                 file: imageSrc,
@@ -157,17 +162,15 @@ export default function Kid() {
                         console.log(e)
                         // will throw an exception if not browser supported
                         if (e) {
-                            ;(function () {
-                                setButt(true)
-                                tts.speak({
-                                    text: e,
-                                    listeners: {
-                                        onend: () => record(true),
-                                    },
-                                })
-                            })()
+                            setButt(true)
+                            tts.speak({
+                                text: e,
+                                listeners: {
+                                    onend: () => record(),
+                                },
+                            })
                         } else {
-                            record(true)
+                            record()
                         }
                         setOcrResults(e)
                     } catch (e) {
