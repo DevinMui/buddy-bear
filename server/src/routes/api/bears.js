@@ -3,6 +3,7 @@ import multer from 'multer'
 import crypto from 'crypto'
 import mime from 'mime-types'
 import Bear from '../../models/bear'
+import base64ToImage from 'base64-to-image'
 
 let router = express.Router()
 
@@ -30,9 +31,13 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/ocr', async (req, res) => {
-    const image = req.body.file;
+    const base64Str = req.body.file;
     //convert into a actual image file somehow
-    const texts = await detectText(file)
+    var path ='./uploads/fuck.jpg';
+    var optionalObj = {'fileName': 'jenny', 'type':'png'};
+    var imageInfo = base64ToImage(base64Str,path, optionalObj); 
+    var newpath = path + "jenny.png"
+    const texts = await detectText(newpath)
     res.json({ status: 'success', data: texts })
 })
 
