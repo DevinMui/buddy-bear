@@ -1,3 +1,4 @@
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Button } from 'react-bootstrap'
 import styled from 'styled-components'
@@ -48,53 +49,26 @@ export default function Kid() {
     // camera
     // paw
     const { id, judge } = useParams()
-    // const [socket, setSocket] = useState(io.connect())
-    const [socket, setSocket] = useState(undefined)
+    const [socket, setSocket] = useState(io.connect())
     const camRef = useRef(null)
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
     const [isPortrait, setIsPortrait] = useState(true)
     const [recorder, setRecorder] = useState(new MicRecorder({ bitRate: 128 }))
-    const [speech, setSpeech] = useState(null)
-    const [speechResults, setSpeechResults] = useState('b')
     const [ocrResults, setOcrResults] = useState('')
-    const [interim, setInterim] = useState('a')
+    const { transcript, resetTranscript } = useSpeechRecognition()
 
     const [butt, setButt] = useState(false)
     const [tts, setTts] = useState(new Speech())
-    const [recog, setRecog] = useState(false)
 
     useEffect(() => {
         tts.init()
     }, [])
 
     useEffect(() => {
-        if (speech) return
-        let speechRecognition = window.SpeechRecognition
-        // eslint-disable-next-line
-        if (!speechRecognition) speechRecognition = webkitSpeechRecognition
-        if (!speechRecognition) toast('Error loading speech recognition.')
-        const recognition = new speechRecognition()
-        recognition.continuous = true
-        recognition.interimResults = true
-        recognition.onresult = newFn 
-
-        if (recog) return
-
-        recognition.start()
-        setSpeech(recognition)
-        setRecog(false)
+        SpeechRecognition.startListening({ continuous: true })
     }, [])
-    const newFn = (event) => {
-        console.log('f',interim, speechResults)
-        if (event.results[0].isFinal) {
-            setSpeechResults(speechResults + event.results[0][0].transcript)
-        } else {
-            console.log('interim', event.results[0][0].transcript)
-            setInterim(event.results[0][0].transcript)
-        }
 
-    }
     useEffect(() => {
         const e = function () {
             console.log(window.orientation)
@@ -106,22 +80,22 @@ export default function Kid() {
         window.addEventListener('resize', e)
 
         //socket shiz
-        // socket.on('scan', () => {
-        //     // either with send()
-        //     console.log('socket on')
-        // })
+        socket.on('scan', () => {
+            // either with send()
+            console.log('socket on')
+        })
 
         return window.removeEventListener('resize', e)
     }, [])
 
+    console.log(transcript)
     const record = (isStart) => {
         if (!recorder) return console.log('no recorder')
 
         if (isStart) {
             recorder.start().catch((e) => console.log(e))
             // Clear speech results
-            setSpeechResults('')
-            setInterim('')
+            resetTranscript()
             console.log('start')
         } else {
             recorder
@@ -137,10 +111,9 @@ export default function Kid() {
                     })
                     console.log(file)
                     // Grab speech results
-                    console.log(speechResults + ' ' + interim)
                     let c = {
                         expected: ocrResults,
-                        recorded: [speechResults, interim].join(' '),
+                        recorded: transcript,
                     }
                     const d = new FormData()
                     d.append('audio', file)
