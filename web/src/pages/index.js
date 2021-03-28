@@ -115,7 +115,7 @@ function App() {
                         <Route exact path="/">
                             <Dash />
                         </Route>
-                        <Route exact path="/kids/:book_id">
+                        <Route exact path="/kids/:id">
                             <Kids />
                         </Route>
                     </>

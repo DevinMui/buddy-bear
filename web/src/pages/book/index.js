@@ -10,7 +10,7 @@ import Comparison from './comparison'
 
 function Book() {
     const [pageIndex, setPageIndex] = useState(0)
-    const [book, setBook] = useState({})
+    const [book, setBook] = useState(null)
 
     const { id } = useParams()
 
