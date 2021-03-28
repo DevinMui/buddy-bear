@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import {Button} from 'react-bootstrap';
 import styled from "styled-components";
 import Webcam from "react-webcam";
+import axios from 'axios';
 
 const Background = styled.div`
   background: var(--primary-color);
@@ -35,6 +37,7 @@ export default function () {
   // camera
   // paw
   const camRef = useRef(null);
+  const [img, setImg] = useState("");
   const [cameraActive, setCameraActive] = useState(false);
   const [isLandscape, setIsLandscape] = useState(true);
 
@@ -47,6 +50,20 @@ export default function () {
     window.addEventListener("resize", e);
     return window.removeEventListener("resize", e);
   }, []);
+
+  const capture = useCallback(() => {
+    const imageSrc = camRef.current.getScreenshot();
+    console.log(imageSrc);
+    axios.post('/api/bears/ocr/', {
+      file:imageSrc
+    })
+    .then((response) => {
+      console.log("it returned or something")
+      console.log(response);
+    }, (error) => {
+      console.log(error);
+    });
+  }, [camRef, setImg]);
 
   return (
     <Background>
@@ -65,6 +82,9 @@ export default function () {
               ? "Put me in your bear's paw."
               : "Rotate the phone to start reading."}
           </h2>
+          <Button onClick={capture}>
+            Press to Take Screenshot
+          </Button>
         </div>
         <div
           className="col-6 offset-5"

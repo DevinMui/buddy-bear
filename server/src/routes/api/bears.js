@@ -29,8 +29,9 @@ router.get('/:id', async (req, res) => {
     res.json({ status: 'success', data: bear })
 })
 
-router.post('/ocr', upload.single('file'), async (req, res) => {
-    const file = req.file.path
+router.post('/ocr', async (req, res) => {
+    const image = req.body.file;
+    //convert into a actual image file somehow
     const texts = await detectText(file)
     res.json({ status: 'success', data: texts })
 })
