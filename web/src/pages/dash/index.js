@@ -32,37 +32,21 @@ function Dash() {
 
     function spawnBook(bookObj) {
         return (
-            <Card style={{ width: '18rem' }}>
-                <Card.Img variant="top" src={marble} />
-                <Card.Body>
-                    <Card.Title>{bookObj.title}</Card.Title>
-                    <Link to="/books/:id" className="btn btn-new">
-                        <i className="" />
+            <div className="px-2 col-md-3 col-12 my-3 align-self-start">
+                <div className="card-i">
+                    <Link to="/books/:id" style={{ color: 'inherit' }}>
+                        <Card.Img variant="top" src={marble} />
+                        <Card.Body>
+                            <Card.Title>{bookObj.title}</Card.Title>
+                        </Card.Body>
                     </Link>
-                </Card.Body>
-            </Card>
-        )
-    }
-
-    function spawnBookGroup(i) {
-        return (
-            <CardDeck>
-                {spawnBook(bookList[i])}
-                {spawnBook(bookList[i + 1])}
-                {spawnBook(bookList[i + 2])}
-            </CardDeck>
+                </div>
+            </div>
         )
     }
 
     function spawnBookList() {
-        let returnBookList = []
-        var i = 0
-        for (i = 0; i < bookList.length; i++) {
-            returnBookList.push(spawnBookGroup(i))
-            i++
-            i++
-        }
-        return returnBookList
+        return bookList.map((b) => spawnBook(b))
     }
 
     useEffect(() => {
@@ -111,21 +95,22 @@ function Dash() {
             </div>
 
             <div className="container mt-4">
-                <div className="row">
-                    <div className="col-md-3">
+                <div className="row d-flex align-items-center">
+                    <div className="col-12 col-md-3 text-center">
                         <Link to="/books" className="btn btn-new">
                             <i
                                 className="bi bi-plus"
-                                // style={{
-                                //     fontSize: '64px',
-                                // }}
+                                style={{
+                                    fontSize: '64px',
+                                }}
                             />
                         </Link>
                     </div>
-                    <div className="col-md-9">{spawnBookList()}</div>
+                    {spawnBookList()}
                 </div>
+            </div>
 
-                {/* <div
+            {/* <div
                     style={{
                         height: '500px',
                         marginTop: '25px',
@@ -135,7 +120,6 @@ function Dash() {
                 >
                     <LineGraph data={data} />
                 </div> */}
-            </div>
         </>
     )
 }
