@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 import { BookCard } from '../../components/card'
 
@@ -9,11 +10,24 @@ import Comparison from './comparison'
 
 function Book() {
     const [pageIndex, setPageIndex] = useState(0)
+    const [book, setBook] = useState({})
 
     const { id } = useParams()
 
     // load
-    useEffect(() => {})
+    useEffect(() => {
+        async function getBook() {
+            try {
+                const res = await axios.get(`/api/books/${id}`)
+                const book = res.data.data
+                setBook(book)
+            } catch (e) {
+                console.error(e)
+            }
+        }
+
+        getBook()
+    })
 
     let page
 
