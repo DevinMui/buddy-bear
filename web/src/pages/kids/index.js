@@ -58,6 +58,7 @@ export default function () {
     const [speech, setSpeech] = useState(null)
     const [speechResults, setSpeechResults] = useState('')
     const [ocrResults, setOcrResults] = useState('')
+    const [interim, setInterim] = useState('')
 
     useEffect(() => {
         if (speech) return
@@ -69,17 +70,16 @@ export default function () {
         recognition.continuous = true
         recognition.interimResults = true
         recognition.onresult = function (event) {
-            var interim_transcript = ''
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
                     console.log('final', event.results[i][0].transcript)
+                    setSpeechResults(
+                        speechResults + event.results[i][0].transcript
+                    )
                 } else {
-                    interim_transcript += event.results[i][0].transcript
                     console.log('interim', event.results[i][0].transcript)
+                    setInterim(event.results[i][0].transcript)
                 }
-                setSpeechResults(
-                    speechResults + event.results[i][0].transcript
-                )
             }
         }
         recognition.start()
@@ -111,6 +111,7 @@ export default function () {
                 .catch(error)
             // Clear speech results
             setSpeechResults('')
+            setInterim('')
         } else {
             recorder
                 .stop()
@@ -125,10 +126,10 @@ export default function () {
                     })
                     console.log(file)
                     // Grab speech results
-                    console.log(speechResults)
+                    console.log(speechResults + ' ' + interim)
                     let c = {
                         expected: ocrResults,
-                        recorded: speechResults,
+                        recorded: speechResults + ' ' + interim,
                     }
                     const d = new FormData()
                     d.append('audio', file)
@@ -177,7 +178,10 @@ export default function () {
                 (response) => {
                     console.log(response)
                     console.log('it returned or something')
-                    const e = response.data.data.map(item => item.description).join(' ')
+                    const e = response.data.data
+                        .map((item) => item.description)
+                        .join(' ')
+                    console.log(e)
                     setOcrResults(e)
                 },
                 (error) => {
