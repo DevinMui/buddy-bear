@@ -1,12 +1,25 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import multer from 'multer'
+import crypto from 'crypto'
+import mime from 'mime-types'
 import Book from '../../models/book'
 import Page from '../../models/page'
 
 let router = express.Router()
 
-const upload = multer({ dest: 'uploads/' })
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => {
+        crypto.pseudoRandomBytes(16, function (err, raw) {
+            if (err) return cb(err)
+
+            cb(null, `${raw.toString('hex')}.${mime.extension(file.mimetype)}`)
+        })
+    },
+})
+
+const upload = multer({ storage: storage })
 
 router.get('/', async (req, res, next) => {
     try {
