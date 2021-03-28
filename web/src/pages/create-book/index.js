@@ -1,7 +1,8 @@
 import Modal from 'react-modal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BookCard } from '../../components/card'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
+import _ from 'lodash'
 
 const DUMMY_BOOK_RESULTS = [
     {
@@ -79,12 +80,22 @@ const SearchBar = (props) => {
         </div>
     )
 }
-
+const MicRecorder = require('mic-recorder-to-mp3')
 export default function CreateBook() {
     const [search, setSearch] = useState('')
     const [router, setRouter] = useState(0)
     const [books, setBooks] = useState([]) // Array for results, object for selection
     const [modalOpen, setModalOpen] = useState(false)
+    const [recorder, setRecorder] = useState(null)
+    const [currFile, setCurrFile] = useState({
+        isRecording: false,
+        file: null,
+    })
+    const [files, setFiles] = useState([])
+
+    useEffect(() => {
+        if (!recorder) setRecorder(new MicRecorder({ bitRate: 128 }))
+    }, [])
 
     const submit = () => {
         if (!search) return
@@ -93,10 +104,64 @@ export default function CreateBook() {
         setBooks(data)
     }
     const synthesize = () => {
-        // TOOD: make API call here
+        // TODO: make API call here
+    }
+    const history = useHistory()
+    const endRecording = () => {
+        // TODO: make API call here
+        setModalOpen(false)
+        history.push('/')
     }
     const record = () => {
-        setModalOpen(true)
+        const error = () => {
+            setCurrFile({ file: null, isRecording: false })
+            alert('⚠ Error starting recording.')
+        }
+        if (!recorder) error()
+        if (!currFile.isRecording) {
+            recorder
+                .start()
+                .then(() => setCurrFile({ file: null, isRecording: true }))
+                .catch(error)
+        } else {
+            recorder
+                .stop()
+                .getMp3()
+                .then(([buffer, blob]) => {
+                    // do what ever you want with buffer and blob
+                    // Example: Create a mp3 file and play
+                    const file = new File(buffer, 'page.mp3', {
+                        type: blob.type,
+                        lastModified: Date.now(),
+                    })
+                    setCurrFile({
+                        file,
+                        isRecording: false,
+                    })
+                    // const player = new Audio(URL.createObjectURL(file))
+                    // player.play()
+                })
+                .catch(error)
+        }
+    }
+
+    const nextPage = () => {
+        setFiles([...files, currFile.file])
+        setCurrFile({
+            file: null,
+            isRecording: false,
+        })
+    }
+
+    const prevPage = () => {
+        setCurrFile({ file: files[files.length - 1], isRecording: false })
+        setFiles(_.initial(files))
+    }
+
+    const getMiddleButtonString = () => {
+        if (currFile.isRecording) return 'Stop'
+        if (currFile.file) return 'Rerecord'
+        else return 'Record'
     }
 
     switch (router) {
@@ -146,7 +211,7 @@ export default function CreateBook() {
                         <div className="row py-5 text-center d-flex align-items-center">
                             <div
                                 className="col-xs-12 col-md-4 offset-md-1"
-                                onClick={record}
+                                onClick={() => setModalOpen(true)}
                                 style={{ cursor: 'pointer' }}
                             >
                                 <i
@@ -160,7 +225,7 @@ export default function CreateBook() {
                             </div>
                             <div
                                 className="col-xs-12 col-md-4"
-                                onclick={synthesize}
+                                onClick={synthesize}
                                 style={{ cursor: 'pointer' }}
                             >
                                 <i
@@ -174,7 +239,11 @@ export default function CreateBook() {
                     <Modal
                         isOpen={modalOpen}
                         className="card-i bg-color px-4 py-4"
-                        onRequestClose={() => setModalOpen(false)}
+                        onRequestClose={() => {
+                            setModalOpen(false)
+                            setCurrFile({ file: null, isRecording: false })
+                            setFiles([])
+                        }}
                         style={{
                             overlay: { backgroundColor: 'rgba(33,33,33,0.4)' },
                             content: {
@@ -187,6 +256,13 @@ export default function CreateBook() {
                             },
                         }}
                     >
+                        <div
+                            style={{ position: 'absolute', top: 16, right: 24 }}
+                        >
+                            <Link onClick={endRecording} to="#">
+                                End
+                            </Link>
+                        </div>
                         <div className="text-center">
                             <h3>Record</h3>
                             <div>Grab the book and start reading.</div>
@@ -195,12 +271,51 @@ export default function CreateBook() {
                                 className="bi-soundwave"
                                 style={{
                                     fontSize: 128,
-                                    color: 'var(--primary-ii-color)',
+                                    color: currFile.isRecording
+                                        ? 'var(--primary-ii-color)'
+                                        : 'var(--text-color)',
                                 }}
                             />
+
                             <div className="row px-3 d-flex justify-content-between ">
-                                <Link to="#">Previous Page</Link>
-                                <Link to="#">Next Page</Link>
+                                <Link
+                                    to="#"
+                                    onClick={prevPage}
+                                    style={{
+                                        zIndex: 9,
+                                        visibility: files.length
+                                            ? 'inherit'
+                                            : 'hidden',
+                                    }}
+                                >
+                                    Previous Page
+                                </Link>
+                                <Link
+                                    to="#"
+                                    onClick={nextPage}
+                                    style={{
+                                        zIndex: 9,
+                                        visibility: currFile.file
+                                            ? 'inherit'
+                                            : 'hidden',
+                                    }}
+                                >
+                                    Next Page
+                                </Link>
+
+                                <div
+                                    style={{
+                                        zIndex: 1,
+                                        position: 'absolute',
+                                        right: 0,
+                                        left: 0,
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    <Link to="#" onClick={record}>
+                                        {getMiddleButtonString()}
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </Modal>

@@ -15,6 +15,7 @@
         "axios": "^0.21.1",
         "bootstrap": "^4.6.0",
         "lodash": "^4.17.21",
+        "mic-recorder-to-mp3": "^2.2.2",
         "moment": "^2.29.1",
         "react": "^17.0.1",
         "react-avatar": "^3.10.0",
