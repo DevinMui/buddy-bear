@@ -53,7 +53,7 @@ export default function Comparison() {
                                 type="words"
                             />
                         </p>
-                        <button className="btn play" onClick={play}>
+                        <button className="play accent-i-color" onClick={play}>
                             <i className="bi bi-play-fill" />
                         </button>
                     </div>
