@@ -29,6 +29,8 @@ function Book() {
         getBook()
     }, [])
 
+    useEffect(() => {window.scrollTo(0, 0)}, [])
+
     let page
 
     switch (pageIndex) {
@@ -63,7 +65,6 @@ function Book() {
                         }}
                     >
                         <BookCard {...book}>
-                            {' '}
                             <Link
                                 to={`/kids/${id}`}
                                 style={{
