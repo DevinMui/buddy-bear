@@ -13,9 +13,9 @@ export default function Comparison() {
     function nextPage() {}
 
     return (
-        <div className="mt-4">
+        <div className="">
             <div className="row">
-                <div className="col-md-6">
+                <div className="mt-4 col-md-6">
                     <h3 className="text-center">Your child</h3>
                     <div className="comparison-card mt-4">
                         <p>
@@ -30,7 +30,7 @@ export default function Comparison() {
                         </button>
                     </div>
                 </div>
-                <div className="col-md-6">
+                <div className="mt-4 col-md-6">
                     <h3 className="text-center">Source</h3>
                     <div className="comparison-card mt-4">
                         <p>Lorem Ipsum</p>
