@@ -64,5 +64,5 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Process is running on port ${PORT}`)
 })
 
-const io = socketio(server)
+const io = socketio(server, { origin: ':' })
 sockets(io)
