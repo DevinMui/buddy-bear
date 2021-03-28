@@ -42,7 +42,7 @@ const CameraWarning = styled.div`
 `
 const MicRecorder = require('mic-recorder-to-mp3')
 
-export default function () {
+export default function Kid() {
     // Put some warnings here for rotation
     // text
     // camera
@@ -65,28 +65,6 @@ export default function () {
 
     const [butt, setButt] = useState(false)
     const [tts, setTts] = useState(null)
-
-    useEffect(() => {
-        if (tts) return
-        const speech = new Speech() // will throw an exception if not browser supported
-        if (!speech.hasBrowserSupport()) {
-            // returns a boolean
-            console.log('no tts supprot')
-            return // toast('Error initializing text-to-speech')
-        }
-        setTts(speech)
-        speech
-            .init()
-            .then(() => {
-                // The "data" object contains the list of available voices and the voice synthesis params
-                setTts(speech)
-                console.log('init ok')
-                // toast('Error initializing text-to-speech')
-            })
-            .catch((e) => {
-                console.error('An error occured while initializing : ', e)
-            })
-    })
 
     useEffect(() => {
         if (speech) return
@@ -221,41 +199,43 @@ export default function () {
             })
             .then(
                 (response) => {
-                    console.log(response)
-                    console.log('it returned or something')
-                    const e = response.data.data[0].description
-                    console.log(e)
-                    // will throw an exception if not browser supported
-                    ;(function () {
-                        const speech = new Speech()
-                        if (!speech.hasBrowserSupport()) {
-                            // returns a boolean
-                            console.log('no tts supprot')
-                            return // toast('Error initializing text-to-speech')
-                        }
-                        setTts(speech)
-                        speech
-                            .init()
-                            .then(() => {
-                                // The "data" object contains the list of available voices and the voice synthesis params
-                                console.log('init ok')
-                                // toast('Error initializing text-to-speech')
+                    try {
+                        console.log(response)
+                        console.log('it returned or something')
+                        const e = response.data.data[0].description
+                        console.log(e)
+                        // will throw an exception if not browser supported
+                        ;(function () {
+                            const speech = new Speech()
+                            if (!speech.hasBrowserSupport()) {
+                                // returns a boolean
+                                console.log('no tts supprot')
+                                return // toast('Error initializing text-to-speech')
+                            }
+                            setTts(speech)
+                            speech
+                                .init()
+                                .then(() => {
+                                    // The "data" object contains the list of available voices and the voice synthesis params
+                                    console.log('init ok')
+                                    // toast('Error initializing text-to-speech')
+                                })
+                                .catch((e) => {
+                                    console.error(
+                                        'An error occured while initializing : ',
+                                        e
+                                    )
+                                })
+                            setButt(true)
+                            speech.speak({
+                                text: e,
+                                listeners: {
+                                    onend: recordingToggle,
+                                },
                             })
-                            .catch((e) => {
-                                console.error(
-                                    'An error occured while initializing : ',
-                                    e
-                                )
-                            })
-                        setButt(true)
-                        speech.speak({
-                            text: e,
-                            listeners: {
-                                onend: recordingToggle,
-                            },
-                        })
-                    })()
-                    setOcrResults(e)
+                        })()
+                        setOcrResults(e)
+                    } catch (e) {}
                 },
                 (error) => {
                     console.log(error)
@@ -351,7 +331,7 @@ export default function () {
                         top: 0,
                         borderColor: 'transparent',
                         color: 'var(--text-color)',
-                        background: 'var(--primary-color)'
+                        background: 'var(--primary-color)',
                     }}
                 >
                     All done!
