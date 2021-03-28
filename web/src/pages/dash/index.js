@@ -28,10 +28,13 @@ function Dash() {
 
     function spawnBook(bookObj) {
         return (
-            <div className="px-2 col-md-3 col-12 my-3 align-self-start">
-                <div className="card-i">
-                    <Link to="/books/:id" style={{ color: 'inherit' }}>
-                        <div style={{borderRadius: 20}} className="primary-ii text-center">
+            <div className="px-2 col-md-3 col-12 my-3 align-self-stretch">
+                <Link to={`/books/${bookObj._id}`} style={{ color: 'inherit' }}>
+                    <div className="card-i" style={{ height: '100%' }}>
+                        <div
+                            style={{ borderRadius: 20 }}
+                            className="primary-ii text-center"
+                        >
                             <Card.Img
                                 variant="top"
                                 src={bookObj.image}
@@ -45,8 +48,8 @@ function Dash() {
                         <Card.Body>
                             <Card.Title>{bookObj.title}</Card.Title>
                         </Card.Body>
-                    </Link>
-                </div>
+                    </div>
+                </Link>
             </div>
         )
     }
@@ -166,7 +169,7 @@ function Dash() {
                 </svg>
             </div>
 
-            <div className="container mt-4 pb-4" >
+            <div className="container mt-4 pb-4">
                 <div className="row d-flex align-items-center">
                     <div className="col-12 col-md-3 text-center">
                         <Link to="/books" className="btn btn-new">
