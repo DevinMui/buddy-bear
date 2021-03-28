@@ -16,11 +16,7 @@ class Book {
     }
 }
 
-let bookListFirst = [
-    new Book('The Very Hungry Caterpillar', 'Eric Carle', 87),
-    new Book('Thomas the Tank Engine', 'Jenny Lee', 12),
-    new Book('Matilda', 'Roald Dahl', 21),
-]
+let bookListFirst = [];
 
 function Dash() {
     const [data, setData] = useState([])
