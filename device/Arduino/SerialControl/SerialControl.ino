@@ -1,7 +1,11 @@
 #include <Servo.h>
+#include <AceButton.h>
+using namespace ace_button;
+
 #include "ServoConfiguration.h"
 #include "Keyframe.h"
 #include "Routines.h"
+#include "SerialProtocol.h"
 
 /**
    Pin number definitions
@@ -13,14 +17,16 @@ const short PIN_LEFT_TILT = 11;
 const short PIN_HEAD_PAN = 12;
 const short PIN_HEAD_TILT = 13;
 
-const short PIN_TOUCH = 2;
-const short PIN_VIBRATION = 13;
+const short PIN_VIBRATION = 2;
+const short PIN_TOUCH = 3;
 
 /**
-   Servo initialization
+   Device initialization
 */
 Servo rightPanServo, rightTiltServo, leftPanServo, leftTiltServo, headPanServo, headTiltServo;
 const Servo* SERVOS[6] = {&rightPanServo, &rightTiltServo, &leftPanServo, &leftTiltServo, &headPanServo, &headTiltServo};
+
+AceButton button{PIN_TOUCH};
 
 /**
    Move all servos based on desired angles, synchronized to take specified durations
@@ -64,15 +70,13 @@ void glide(short* targetAngles, int duration, int step = 10) {
 }
 
 /**
- * Run a specified routine
- */
+   Run a specified routine
+*/
 void runRoutine(const Routine& routine) {
   auto keyframes = routine.GetKeyframes();
   auto keyframesLength = routine.GetNumKeyframes();
   for (int i = 0; i < keyframesLength; ++i) {
     auto keyframe = keyframes[i];
-    Serial.print("Keyframe with duration: ");
-    Serial.println(keyframe.duration);
     if (keyframe.angles != NULL) {
       glide(keyframe.angles, keyframe.duration);
     } else {
@@ -83,9 +87,21 @@ void runRoutine(const Routine& routine) {
   glide(KeyframeAngles::ZEROES, 1000);
 }
 
+void sendMessage(String msg) {
+  Serial.println(msg);
+}
+
+void handleButton(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+  switch (eventType) {
+    case AceButton::kEventPressed:
+      sendMessage(ARDUINO_NOTIFICATION_BUTTON);
+      break;
+  }
+}
+
 /**
- * Setup
- */
+   Setup
+*/
 void setup() {
 
   Serial.begin(9600);
@@ -98,6 +114,13 @@ void setup() {
   headPanServo.attach(PIN_HEAD_PAN);
   headTiltServo.attach(PIN_HEAD_TILT);
 
+  // Set up vibration motor
+  pinMode(PIN_VIBRATION, OUTPUT);
+
+  // Set up capacitive touch sensor
+  pinMode(PIN_TOUCH, INPUT);
+  button.setEventHandler(handleButton);
+
   // Default all servos to 90 degrees
   for (auto servo : SERVOS) {
     servo->write(90);
@@ -105,38 +128,40 @@ void setup() {
 }
 
 /**
- * Loop
- */
+   Loop
+*/
 void loop() {
-  Serial.println("Rt Pan: 1\t Rt Tilt: 2\t Lt Pan: 3\t Lt Tilt: 4\t Hd Pan: 5\t Hd Tilt: 6");
-  Serial.print("Enter joint to control (1-6) OR 0 for Routines: ");
-  while (!Serial.available()) {}
+  button.check();
+  if (Serial.available()) {
+    String command = Serial.readString();
 
-  int jointIndex = Serial.parseInt();
-  Serial.println(jointIndex);
+    if (ARDUINO_COMMAND_SCAN.equals(command)) {
+      sendMessage(ARDUINO_ACK_SUCCESS);
+      runRoutine(scanRoutine);
 
-  if (jointIndex == 0) {
-    runRoutine(rangeTestRoutine);
-    return;
-  }
+    } else if (ARDUINO_COMMAND_WAVE.equals(command)) {
+      sendMessage(ARDUINO_ACK_SUCCESS);
+      runRoutine(waveRoutine);
 
-  jointIndex -= 1;
+    } else if (ARDUINO_COMMAND_DANCE.equals(command)) {
+      sendMessage(ARDUINO_ACK_SUCCESS);
+      runRoutine(danceRoutine);
 
-  Servo* motor = SERVOS[jointIndex];
-  short min_angle = MIN_ANGLES[jointIndex];
-  short max_angle = MAX_ANGLES[jointIndex];
+    } else if (ARDUINO_COMMAND_BUZZ.equals(command)) {
+      sendMessage(ARDUINO_ACK_SUCCESS);
+      digitalWrite(PIN_VIBRATION, HIGH);
+      delay(250);
+      digitalWrite(PIN_VIBRATION, LOW);
 
-  char buf[200];
-  sprintf(buf, "Enter degrees (%d-%d): ", min_angle, max_angle);
-  Serial.print(buf);
-  while (!Serial.available()) {}
-  int deg = Serial.parseInt();
-  Serial.println(deg);
+    } else if (ARDUINO_COMMAND_BUZZ_LONG.equals(command)) {
+      sendMessage(ARDUINO_ACK_SUCCESS);
+      digitalWrite(PIN_VIBRATION, HIGH);
+      delay(750);
+      digitalWrite(PIN_VIBRATION, LOW);
 
-  if (deg >= 0 && deg <= 180) {
-    motor->write(deg);
-  } else {
-    Serial.println("Invalid angle");
-    return;
+    } else {
+      // Didn't recognize the command!
+      sendMessage(ARDUINO_ACK_FAILURE);
+    }
   }
 }

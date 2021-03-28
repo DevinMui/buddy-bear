@@ -17,8 +17,7 @@ Keyframe waveKeyframes[] = {
 
   Keyframe(200, KeyframeAngles::ZEROES),
 };
-int waveKeyframesLength = sizeof(waveKeyframes) / sizeof(Keyframe);
-const static Routine waveRoutine{waveKeyframes, waveKeyframesLength};
+const static Routine waveRoutine{waveKeyframes, sizeof(waveKeyframes) / sizeof(Keyframe)};
 
 Keyframe rangeTestKeyframes[] = {
   Keyframe(200, KeyframeAngles::ZEROES),
@@ -33,7 +32,29 @@ Keyframe rangeTestKeyframes[] = {
   Keyframe(700, KeyframeAngles::TILT_UP),
   Keyframe(700, KeyframeAngles::ZEROES),
 };
-int rangeTestKeyframesLength = sizeof(rangeTestKeyframes) / sizeof(Keyframe);
-const static Routine rangeTestRoutine{rangeTestKeyframes, rangeTestKeyframesLength};
+const static Routine rangeTestRoutine{rangeTestKeyframes,  sizeof(rangeTestKeyframes) / sizeof(Keyframe)};
+
+Keyframe scanKeyframes[] = {
+  Keyframe(200, KeyframeAngles::ZEROES),
+
+  Keyframe(500, KeyframeAngles::PAN_RIGHT),
+  Keyframe(500, KeyframeAngles::ZEROES),
+  Keyframe(500, KeyframeAngles::PAN_LEFT),
+  Keyframe(500, KeyframeAngles::ZEROES),
+};
+const static Routine scanRoutine{scanKeyframes, sizeof(scanKeyframes) / sizeof(Keyframe)};
+
+Keyframe danceKeyframes[] = {
+  Keyframe(200, KeyframeAngles::ZEROES),
+
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  Keyframe(500, KeyframeAngles::WIGGLE_RIGHT),
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  Keyframe(500, KeyframeAngles::WIGGLE_LEFT),
+  Keyframe(500, KeyframeAngles::WIGGLE_MID),
+  
+  Keyframe(500, KeyframeAngles::ZEROES),
+};
+const static Routine danceRoutine{danceKeyframes, sizeof(danceKeyframes) / sizeof(Keyframe)};
 
 #endif // ROUTINES_H
