@@ -35,7 +35,7 @@ function Dash() {
             <div className="px-2 col-md-3 col-12 my-3 align-self-start">
                 <div className="card-i">
                     <Link to="/books/:id" style={{ color: 'inherit' }}>
-                        <Card.Img variant="top" src={marble} />
+                        <Card.Img variant="top" src={marble} style={{borderRadius: 20}}/>
                         <Card.Body>
                             <Card.Title>{bookObj.title}</Card.Title>
                         </Card.Body>
