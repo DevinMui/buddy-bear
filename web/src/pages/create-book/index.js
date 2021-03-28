@@ -1,9 +1,11 @@
+import { v4 as uuid } from 'uuid';
 import Modal from 'react-modal'
 import { useEffect, useState } from 'react'
 import { BookCard } from '../../components/card'
 import { Link, useHistory } from 'react-router-dom'
-import _ from 'lodash'
+import _, { uniqueId } from 'lodash'
 import axios from 'axios'
+import toast, { Toaster } from 'react-hot-toast'
 
 const SearchBar = (props) => {
     const { search, setSearch, submit } = props
@@ -98,18 +100,45 @@ export default function CreateBook() {
             })
     }
     const synthesize = () => {
-        // TODO: make API call here
+        axios
+            .post('/api/books/', books)
+            .then(history.push('/'))
+            .catch(() => {
+                toast("Couldn't add your book. Please try again.")
+            })
     }
     const history = useHistory()
     const endRecording = () => {
-        // TODO: make API call here
-        setModalOpen(false)
-        history.push('/')
+        if (files.length === 0) {
+            console.log(files)
+            setCurrFile({ file: null, isRecording: false })
+            return setModalOpen(false)
+        }
+        const d = new FormData()
+        files.forEach((f) => {
+            d.append('audio', f)
+        })
+        for (let k in Object.keys(books)) {
+            d.append(k, books[k])
+        }
+        axios
+            .post('/api/books/', d, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(() => {
+                setModalOpen(false)
+                history.push('/')
+            })
+            .catch(() => {
+                toast("Couldn't add your book. Please try again.")
+            })
     }
     const record = () => {
         const error = () => {
             setCurrFile({ file: null, isRecording: false })
-            alert('⚠ Error starting recording.')
+            toast('⚠ Error starting recording.')
         }
         if (!recorder) error()
         if (!currFile.isRecording) {
@@ -124,7 +153,7 @@ export default function CreateBook() {
                 .then(([buffer, blob]) => {
                     // do what ever you want with buffer and blob
                     // Example: Create a mp3 file and play
-                    const file = new File(buffer, 'page.mp3', {
+                    const file = new File(buffer, `page-${uuid()}.mp3`, {
                         type: blob.type,
                         lastModified: Date.now(),
                     })
@@ -253,7 +282,16 @@ export default function CreateBook() {
                         <div
                             style={{ position: 'absolute', top: 16, right: 24 }}
                         >
-                            <Link onClick={endRecording} to="#">
+                            <Link
+                                onClick={endRecording}
+                                to="#"
+                                style={{
+                                    visibility:
+                                        currFile.isRecording || !files.length
+                                            ? 'hidden'
+                                            : 'inherit',
+                                }}
+                            >
                                 End
                             </Link>
                         </div>
@@ -273,6 +311,7 @@ export default function CreateBook() {
 
                             <div className="row px-3 d-flex justify-content-between ">
                                 <Link
+                                    className="mt-4"
                                     to="#"
                                     onClick={prevPage}
                                     style={{
@@ -286,6 +325,7 @@ export default function CreateBook() {
                                 </Link>
                                 <Link
                                     to="#"
+                                    className=" mt-4"
                                     onClick={nextPage}
                                     style={{
                                         zIndex: 9,
@@ -303,6 +343,7 @@ export default function CreateBook() {
                                         position: 'absolute',
                                         right: 0,
                                         left: 0,
+                                        marginTop: -24,
                                         textAlign: 'center',
                                     }}
                                 >
@@ -313,6 +354,7 @@ export default function CreateBook() {
                             </div>
                         </div>
                     </Modal>
+                    <Toaster />
                 </>
             )
     }

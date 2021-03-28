@@ -26,6 +26,9 @@ function Dash() {
     const [data, setData] = useState([])
     const [bookList, setBookList] = useState(bookListFirst)
     const user = useSelector((state) => state.user)
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     function spawnBook(bookObj) {
         return (

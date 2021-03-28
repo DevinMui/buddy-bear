@@ -21,7 +21,8 @@ router.get('/', async (req, res, next) => {
 router.post('/', upload.array('audio'), async (req, res, next) => {
     try {
         let body = req.body
-        body.audio.files = req.files
+        if(req.files)
+            body.audio = {files: req.files, mode: 'RECORDED'} 
         const book = await new Book(req.body).save()
         res.json({ status: 'success', data: book })
     } catch (e) {
