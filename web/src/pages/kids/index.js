@@ -72,14 +72,14 @@ export default function () {
             var interim_transcript = ''
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
-                    setSpeechResults(
-                        speechResults + event.results[i][0].transcript
-                    )
                     console.log('final', event.results[i][0].transcript)
                 } else {
                     interim_transcript += event.results[i][0].transcript
                     console.log('interim', event.results[i][0].transcript)
                 }
+                setSpeechResults(
+                    speechResults + event.results[i][0].transcript
+                )
             }
         }
         recognition.start()
@@ -175,9 +175,10 @@ export default function () {
             })
             .then(
                 (response) => {
-                    console.log('it returned or something')
                     console.log(response)
-                    setOcrResults(response)
+                    console.log('it returned or something')
+                    const e = response.data.data.map(item => item.description).join(' ')
+                    setOcrResults(e)
                 },
                 (error) => {
                     console.log(error)
