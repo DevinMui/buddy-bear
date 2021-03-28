@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BookCard } from "../../components/card";
+import axios from 'axios';
 
 const DUMMY_BOOK_RESULTS = [
   {
@@ -82,12 +83,31 @@ export default function CreateBook() {
   const [search, setSearch] = useState("");
   const [router, setRouter] = useState(0);
   const [books, setBooks] = useState([]); // Array for results, object for selection
+
   const submit = () => {
     if (!search) return;
     const data = DUMMY_BOOK_RESULTS;
     // TODO: make gBooks API call here
-    setBooks(data);
+    
+    axios.get(`https://www.googleapis.com/books/v1/volumes?q=${search}`).then(response => {
+        //console.log(response.data);
+        var length = (response.data.items).length;
+        let empty = [];
+        var i = 0;
+        for(i = 0; i < length; i++)
+        {
+            let booky = response.data["items"][i]["volumeInfo"];
+            let titleStr = (booky["title"] !== undefined) ? booky["title"] : "";
+            let authorStr = (booky["authors"] !== undefined) ? booky["authors"][0] : "no author information available";
+            let descriptionStr =  (booky["description"] !== undefined) ? String(booky["description"]).substring(0, 300) + "..." : "no description available";
+            let srcStr = (booky["imageLinks"]["thumbnail"]!== undefined) ? booky["imageLinks"]["thumbnail"]: "";
+
+            empty.push({title: titleStr, author: authorStr, description: descriptionStr, src: srcStr});
+        }
+        setBooks([...empty]);
+    })
   };
+
   switch (router) {
     case 0:
       // Search page

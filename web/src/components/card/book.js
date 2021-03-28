@@ -17,9 +17,9 @@ export default function Book(props) {
         <h3>{props.title}</h3>
         <p>By {props.author}</p>
         <p>
-          {props.description.length > 140
+          {props.description /*length  > 140
             ? props.description.substr(0, 140) + "..."
-            : props.description}
+            : props.description */}
         </p>
       </div>
     </div>
