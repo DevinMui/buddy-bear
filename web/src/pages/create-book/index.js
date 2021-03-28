@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid'
 import Modal from 'react-modal'
 import { useEffect, useState } from 'react'
 import { BookCard } from '../../components/card'
@@ -140,7 +140,7 @@ export default function CreateBook() {
             setCurrFile({ file: null, isRecording: false })
             toast('⚠ Error starting recording.')
         }
-        if (!recorder) error()
+        if (!recorder) return error()
         if (!currFile.isRecording) {
             recorder
                 .start()

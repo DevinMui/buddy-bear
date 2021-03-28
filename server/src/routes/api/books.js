@@ -65,7 +65,7 @@ router.get('/:id/pages', async (req, res, next) => {
 router.post('/:id/pages', upload.single('audio'), async (req, res, next) => {
     try {
         const file = req.file.path
-        let body = req.body
+        let body = {text: JSON.parse(req.body.text)}
         body.book = req.params.id
         body.text.file = file
         const page = await new Page(body).save()
