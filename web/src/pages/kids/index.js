@@ -5,6 +5,7 @@ import Webcam from 'react-webcam'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
 import { useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 const Background = styled.div`
     background: var(--primary-color);
@@ -49,13 +50,41 @@ export default function () {
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
     const [isPortrait, setIsPortrait] = useState(true)
-    const [isRecording, setIsRecording] = useState(false)
     const [currFile, setCurrFile] = useState({
         isRecording: false,
         file: null,
     })
-    const [files, setFiles] = useState([])
     const [recorder, setRecorder] = useState(null)
+    const [speech, setSpeech] = useState(null)
+    const [speechResults, setSpeechResults] = useState('')
+    const [ocrResults, setOcrResults] = useState('')
+
+    useEffect(() => {
+        if (speech) return
+        let speechRecognition = window.SpeechRecognition
+        // eslint-disable-next-line
+        if (!speechRecognition) speechRecognition = webkitSpeechRecognition
+        if (!speechRecognition) toast('Error loading speech recognition.')
+        const recognition = new speechRecognition()
+        recognition.continuous = true
+        recognition.interimResults = true
+        recognition.onresult = function (event) {
+            var interim_transcript = ''
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    setSpeechResults(
+                        speechResults + event.results[i][0].transcript
+                    )
+                    console.log('final', event.results[i][0].transcript)
+                } else {
+                    interim_transcript += event.results[i][0].transcript
+                    console.log('interim', event.results[i][0].transcript)
+                }
+            }
+        }
+        recognition.start()
+        setSpeech(recognition)
+    })
 
     useEffect(() => {
         const e = function () {
@@ -80,6 +109,8 @@ export default function () {
                 .start()
                 .then(() => setCurrFile({ file: null, isRecording: true }))
                 .catch(error)
+            // Clear speech results
+            setSpeechResults('')
         } else {
             recorder
                 .stop()
@@ -93,9 +124,11 @@ export default function () {
                         lastModified: Date.now(),
                     })
                     console.log(file)
+                    // Grab speech results
+                    console.log(speechResults)
                     let c = {
-                        expected: '',
-                        recorded: '',
+                        expected: ocrResults,
+                        recorded: speechResults,
                     }
                     const d = new FormData()
                     d.append('audio', file)
@@ -144,6 +177,7 @@ export default function () {
                 (response) => {
                     console.log('it returned or something')
                     console.log(response)
+                    setOcrResults(response)
                 },
                 (error) => {
                     console.log(error)
