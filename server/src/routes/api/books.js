@@ -34,8 +34,8 @@ router.get('/', async (req, res, next) => {
 router.post('/', upload.array('audio'), async (req, res, next) => {
     try {
         let body = req.body
-        if(req.files)
-            body.audio = {files: req.files, mode: 'RECORDED'} 
+        if (req.files) body.audio = { files: req.files, mode: 'RECORDED' }
+        body.user = mongoose.ObjectId(req.user._id)
         const book = await new Book(req.body).save()
         res.json({ status: 'success', data: book })
     } catch (e) {
@@ -66,6 +66,7 @@ router.post('/:id/pages', upload.single('audio'), async (req, res, next) => {
     try {
         const file = req.file.path
         let body = req.body
+        body.book = mongoose.ObjectId(req.params.id)
         body.text.file = file
         const page = await new Page(body).save()
         res.json({ status: 'success', data: page })
