@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 import { BookCard } from '../../components/card'
@@ -55,8 +55,26 @@ function Book() {
         <>
             <div className="mini-hero">
                 <div className="container">
-                    <div className="row">
-                        <BookCard {...book} />
+                    <div
+                        style={{
+                            position: 'relative',
+                            margin: -24,
+                            width: 'auto',
+                        }}
+                    >
+                        <BookCard {...book}>
+                            {' '}
+                            <Link
+                                to={`/kids/${id}`}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 18,
+                                    right: 18,
+                                }}
+                            >
+                                Start Reading
+                            </Link>
+                        </BookCard>
                     </div>
                 </div>
             </div>
