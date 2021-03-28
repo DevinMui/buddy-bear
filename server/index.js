@@ -1,4 +1,5 @@
 import express from 'express'
+import socketio from 'socket.io'
 import session from 'express-session'
 import passport from 'passport'
 import redis from 'redis'
@@ -6,6 +7,7 @@ import redisStore from 'connect-redis'
 import mongoose from 'mongoose'
 import path from 'path'
 import compression from 'compression'
+import sockets from './src/sockets'
 
 import config from '@app/config'
 
@@ -58,6 +60,9 @@ if (config.NODE_ENV === 'production') {
     })
 }
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Process is running on port ${PORT}`)
 })
+
+const io = socketio(server)
+sockets(io)
