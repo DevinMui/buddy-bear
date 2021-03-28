@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import Speech from 'speak-tts'
+import io from 'socket.io-client'
 
 const Background = styled.div`
     background: var(--primary-color);
@@ -47,6 +48,7 @@ export default function () {
     // camera
     // paw
     const { id, judge } = useParams()
+    const socket = io.connect()
     const camRef = useRef(null)
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
@@ -117,6 +119,12 @@ export default function () {
                 setIsPortrait(window.orientation % 180 === 0)
             setIsPortrait(window.innerHeight > window.innerWidth)
         }
+        //socket shiz
+        socket.on('scan', () => {
+            // either with send()
+            console.log('socket on')
+        })
+
         if (!recorder) setRecorder(new MicRecorder({ bitRate: 128 }))
         e()
         window.addEventListener('resize', e)
@@ -192,6 +200,15 @@ export default function () {
             record()
         }
     }
+
+    function join() {
+        socket.emit('join', { id: 0 })
+    }
+
+    function giveReward() {
+        socket.emit('reward', { id: 1 })
+    }
+
     const capture = useCallback(() => {
         const imageSrc = camRef.current.getScreenshot()
         console.log(imageSrc)
@@ -309,6 +326,17 @@ export default function () {
                     }}
                 >
                     Record
+                </Button>
+
+                <Button
+                    onClick={giveReward}
+                    style={{
+                        display: isPortrait ? 'block' : 'none',
+                        position: 'fixed',
+                        zIndex: 99,
+                    }}
+                >
+                    Give Reward
                 </Button>
             </div>
         </Background>
