@@ -1,5 +1,5 @@
 export default function Book(props) {
-    if (!props.description) props.description = ''
+    const description = props.description || ''
     return (
         <div
             {...props}
@@ -22,9 +22,9 @@ export default function Book(props) {
                 <h3>{props.title}</h3>
                 <p>By {props.author}</p>
                 <p>
-                    {props.description.length > 140
-                        ? props.description.substr(0, 140) + '...'
-                        : props.description}
+                    {description.length > 140
+                        ? description.substr(0, 140) + '...'
+                        : description}
                 </p>
                 {props.children}
             </div>
