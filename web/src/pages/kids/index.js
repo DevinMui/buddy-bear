@@ -75,15 +75,17 @@ export default function () {
             return // toast('Error initializing text-to-speech')
         }
         setTts(speech)
-        speech.init().then(() => {
-            // The "data" object contains the list of available voices and the voice synthesis params
-            setTts(speech)
-            console.log('init ok')
-            // toast('Error initializing text-to-speech')
-        }).catch(e => {
-            console.error("An error occured while initializing : ", e)
-        })
-        
+        speech
+            .init()
+            .then(() => {
+                // The "data" object contains the list of available voices and the voice synthesis params
+                setTts(speech)
+                console.log('init ok')
+                // toast('Error initializing text-to-speech')
+            })
+            .catch((e) => {
+                console.error('An error occured while initializing : ', e)
+            })
     })
 
     useEffect(() => {
@@ -212,7 +214,7 @@ export default function () {
     const capture = useCallback(() => {
         const imageSrc = camRef.current.getScreenshot()
         console.log(imageSrc)
-        if(tts) tts.cancel()
+        if (tts) tts.cancel()
         axios
             .post('/api/bears/ocr/', {
                 file: imageSrc,
@@ -222,27 +224,36 @@ export default function () {
                     console.log(response)
                     console.log('it returned or something')
                     const e = response.data.data[0].description
-                    console.log(e);
+                    console.log(e)
                     // will throw an exception if not browser supported
-                    (function(){
-                        const speech = new Speech() 
+                    ;(function () {
+                        const speech = new Speech()
                         if (!speech.hasBrowserSupport()) {
                             // returns a boolean
                             console.log('no tts supprot')
                             return // toast('Error initializing text-to-speech')
                         }
                         setTts(speech)
-                        speech.init().then(() => {
-                            // The "data" object contains the list of available voices and the voice synthesis params
-                            console.log('init ok')
-                            // toast('Error initializing text-to-speech')
-                        }).catch(e => {
-                            console.error("An error occured while initializing : ", e)
-                        })
+                        speech
+                            .init()
+                            .then(() => {
+                                // The "data" object contains the list of available voices and the voice synthesis params
+                                console.log('init ok')
+                                // toast('Error initializing text-to-speech')
+                            })
+                            .catch((e) => {
+                                console.error(
+                                    'An error occured while initializing : ',
+                                    e
+                                )
+                            })
                         setButt(true)
-                        speech.speak({text: e, listeners: {
-                            onend: recordingToggle
-                        }})   
+                        speech.speak({
+                            text: e,
+                            listeners: {
+                                onend: recordingToggle,
+                            },
+                        })
                     })()
                     setOcrResults(e)
                 },
@@ -307,9 +318,10 @@ export default function () {
                     class="card-i"
                     onClick={capture}
                     style={{
-                        display: judge ?  'none':'block',
+                        display: judge ? 'none' : 'block',
                         position: 'fixed',
-                        bottom: 0, left: 0,
+                        bottom: 0,
+                        left: 0,
                         zIndex: 99,
                     }}
                     disabled={butt}
@@ -330,13 +342,19 @@ export default function () {
 
                 <Button
                     onClick={giveReward}
+                    class="card-i"
                     style={{
-                        display: isPortrait ? 'block' : 'none',
+                        display: judge ? 'none' : 'block',
                         position: 'fixed',
                         zIndex: 99,
+                        right: 0,
+                        top: 0,
+                        borderColor: 'transparent',
+                        color: 'var(--text-color)',
+                        background: 'var(--primary-color)'
                     }}
                 >
-                    Give Reward
+                    All done!
                 </Button>
             </div>
         </Background>
