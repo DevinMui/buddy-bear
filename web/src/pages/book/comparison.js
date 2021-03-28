@@ -1,16 +1,44 @@
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import axios from 'axios'
+
 import Diff from 'react-stylable-diff'
 
 export default function Comparison() {
-    const [page, setPage] = useState({})
+    const [pages, setPages] = useState([])
+    const [pageIndex, setPageIndex] = useState(-1)
 
-    useEffect(() => {})
+    const { id } = useParams()
+
+    let audio = undefined
+
+    useEffect(() => {
+        async function getPages() {
+            try {
+                const res = await axios.get(`/api/books/${id}/pages`)
+                const pages = res.data.data
+                setPages(pages)
+                setPageIndex(0)
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        getPages()
+    }, [])
 
     function play() {}
 
-    function prevPage() {}
+    function prevPage() {
+        setPageIndex(pageIndex - 1)
+    }
 
-    function nextPage() {}
+    function nextPage() {
+        console.log(pageIndex)
+        setPageIndex(pageIndex + 1)
+    }
+
+    // replace with loader
+    // if (pageIndex === -1) return <></>
 
     return (
         <div className="">
@@ -40,17 +68,26 @@ export default function Comparison() {
                         >
                             <i className="bi bi-play-fill"></i>
                         </button>
+                        <audio src="" ref={(a) => (audio = a)} />
                     </div>
                 </div>
             </div>
             <div className="mt-4">
                 <div className="float-left">
-                    <button className="btn btn-link" onClick={prevPage}>
+                    <button
+                        className="btn btn-link"
+                        disabled={pageIndex === 0}
+                        onClick={prevPage}
+                    >
                         Previous Page
                     </button>
                 </div>
                 <div className="float-right">
-                    <button className="btn btn-link" onClick={nextPage}>
+                    <button
+                        className={'btn btn-link'}
+                        disabled={pageIndex === pages.length - 1}
+                        onClick={nextPage}
+                    >
                         Next Page
                     </button>
                 </div>

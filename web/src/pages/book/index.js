@@ -27,7 +27,7 @@ function Book() {
             }
         }
         getBook()
-    })
+    }, [])
 
     let page
 

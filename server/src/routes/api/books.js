@@ -1,5 +1,4 @@
 import express from 'express'
-import mongoose from 'mongoose'
 import multer from 'multer'
 import crypto from 'crypto'
 import mime from 'mime-types'
@@ -23,7 +22,7 @@ const upload = multer({ storage: storage })
 
 router.get('/', async (req, res, next) => {
     try {
-        const books = await Book.find({ user: mongoose.ObjectId(req.user._id) })
+        const books = await Book.find({ user: req.user._id })
         res.json({ status: 'success', data: books })
     } catch (e) {
         next(e)
@@ -34,8 +33,9 @@ router.get('/', async (req, res, next) => {
 router.post('/', upload.array('audio'), async (req, res, next) => {
     try {
         let body = req.body
-        if(req.files)
-            body.audio = {files: req.files, mode: 'RECORDED'} 
+        if (req.files) body.audio = { files: req.files, mode: 'RECORDED' }
+        body.user = req.user._id
+        console.log(body)
         const book = await new Book(req.body).save()
         res.json({ status: 'success', data: book })
     } catch (e) {
@@ -54,7 +54,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.get('/:id/pages', async (req, res, next) => {
     try {
-        const pages = await Page.find({ book: mongoose.ObjectId(req.user._id) })
+        const pages = await Page.find({ book: req.user._id })
         res.json({ status: 'success', data: pages })
     } catch (e) {
         next(e)
@@ -66,6 +66,7 @@ router.post('/:id/pages', upload.single('audio'), async (req, res, next) => {
     try {
         const file = req.file.path
         let body = req.body
+        body.book = req.params.id
         body.text.file = file
         const page = await new Page(body).save()
         res.json({ status: 'success', data: page })
