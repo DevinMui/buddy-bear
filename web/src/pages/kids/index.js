@@ -5,6 +5,8 @@ import Webcam from 'react-webcam'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
 import { useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import Speech from 'speak-tts'
 import io from 'socket.io-client'
 
 const Background = styled.div`
@@ -45,8 +47,8 @@ export default function () {
     // text
     // camera
     // paw
+    const { id, judge } = useParams()
     const socket = io.connect()
-    const { id } = useParams()
     const camRef = useRef(null)
     const [img, setImg] = useState('')
     const [cameraActive, setCameraActive] = useState(false)
@@ -61,6 +63,31 @@ export default function () {
     const [ocrResults, setOcrResults] = useState('')
     const [interim, setInterim] = useState('')
 
+    const [butt, setButt] = useState(false)
+    const [tts, setTts] = useState(null)
+
+    useEffect(() => {
+        if (tts) return
+        const speech = new Speech() // will throw an exception if not browser supported
+        if (!speech.hasBrowserSupport()) {
+            // returns a boolean
+            console.log('no tts supprot')
+            return // toast('Error initializing text-to-speech')
+        }
+        setTts(speech)
+        speech
+            .init()
+            .then(() => {
+                // The "data" object contains the list of available voices and the voice synthesis params
+                setTts(speech)
+                console.log('init ok')
+                // toast('Error initializing text-to-speech')
+            })
+            .catch((e) => {
+                console.error('An error occured while initializing : ', e)
+            })
+    })
+
     useEffect(() => {
         if (speech) return
         let speechRecognition = window.SpeechRecognition
@@ -73,12 +100,12 @@ export default function () {
         recognition.onresult = function (event) {
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
-                    console.log('final', event.results[i][0].transcript)
+                    // console.log('final', event.results[i][0].transcript)
                     setSpeechResults(
                         speechResults + event.results[i][0].transcript
                     )
                 } else {
-                    console.log('interim', event.results[i][0].transcript)
+                    // console.log('interim', event.results[i][0].transcript)
                     setInterim(event.results[i][0].transcript)
                 }
             }
@@ -164,6 +191,7 @@ export default function () {
     }
 
     function recordingToggle() {
+        setButt(false)
         if (currFile.isRecording) {
             //is recording
             console.log('end recording')
@@ -186,6 +214,7 @@ export default function () {
     const capture = useCallback(() => {
         const imageSrc = camRef.current.getScreenshot()
         console.log(imageSrc)
+        if (tts) tts.cancel()
         axios
             .post('/api/bears/ocr/', {
                 file: imageSrc,
@@ -194,10 +223,38 @@ export default function () {
                 (response) => {
                     console.log(response)
                     console.log('it returned or something')
-                    const e = response.data.data
-                        .map((item) => item.description)
-                        .join(' ')
+                    const e = response.data.data[0].description
                     console.log(e)
+                    // will throw an exception if not browser supported
+                    ;(function () {
+                        const speech = new Speech()
+                        if (!speech.hasBrowserSupport()) {
+                            // returns a boolean
+                            console.log('no tts supprot')
+                            return // toast('Error initializing text-to-speech')
+                        }
+                        setTts(speech)
+                        speech
+                            .init()
+                            .then(() => {
+                                // The "data" object contains the list of available voices and the voice synthesis params
+                                console.log('init ok')
+                                // toast('Error initializing text-to-speech')
+                            })
+                            .catch((e) => {
+                                console.error(
+                                    'An error occured while initializing : ',
+                                    e
+                                )
+                            })
+                        setButt(true)
+                        speech.speak({
+                            text: e,
+                            listeners: {
+                                onend: recordingToggle,
+                            },
+                        })
+                    })()
                     setOcrResults(e)
                 },
                 (error) => {
@@ -258,20 +315,24 @@ export default function () {
                 </div>
 
                 <Button
+                    class="card-i"
                     onClick={capture}
                     style={{
-                        display: isPortrait ? 'block' : 'none',
+                        display: judge ? 'none' : 'block',
                         position: 'fixed',
+                        bottom: 0,
+                        left: 0,
                         zIndex: 99,
                     }}
+                    disabled={butt}
                 >
-                    Press to Take Screenshot
+                    Simulate Bear Pat
                 </Button>
 
                 <Button
                     onClick={recordingToggle}
                     style={{
-                        display: isPortrait ? 'block' : 'none',
+                        display: 'none',
                         position: 'fixed',
                         zIndex: 99,
                     }}
@@ -281,13 +342,19 @@ export default function () {
 
                 <Button
                     onClick={giveReward}
+                    class="card-i"
                     style={{
-                        display: isPortrait ? 'block' : 'none',
+                        display: judge ? 'none' : 'block',
                         position: 'fixed',
                         zIndex: 99,
+                        right: 0,
+                        top: 0,
+                        borderColor: 'transparent',
+                        color: 'var(--text-color)',
+                        background: 'var(--primary-color)'
                     }}
                 >
-                    Give Reward
+                    All done!
                 </Button>
             </div>
         </Background>
