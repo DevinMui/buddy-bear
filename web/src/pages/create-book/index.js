@@ -3,45 +3,7 @@ import { useEffect, useState } from 'react'
 import { BookCard } from '../../components/card'
 import { Link, useHistory } from 'react-router-dom'
 import _ from 'lodash'
-
-const DUMMY_BOOK_RESULTS = [
-    {
-        // author
-        author: 'Eric Carle',
-        // title
-        title: 'Harry Potter and the Sorcerer of Fire',
-        // description
-        description:
-            'Additionally, Bootstrap also includes an .mx-auto class for horizontally centering fixed-width block level content—that is, content that has display: block and a width set—by setting the horizontal margins to auto.',
-        // src
-        src:
-            'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHw%3D&w=1000&q=80',
-    },
-    {
-        // author
-        author: 'Eric Carle',
-        // title
-        title: 'Harry Potter and the Sorcerer of Fire',
-        // description
-        description:
-            'Additionally, Bootstrap also includes an .mx-auto class for horizontally centering fixed-width block level content—that is, content that has display: block and a width set—by setting the horizontal margins to auto.',
-        // src
-        src:
-            'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHw%3D&w=1000&q=80',
-    },
-    {
-        // author
-        author: 'Eric Carle',
-        // title
-        title: 'Harry Potter and the Sorcerer of Fire',
-        // description
-        description:
-            'Additionally, Bootstrap also includes an .mx-auto class for horizontally centering fixed-width block level content—that is, content that has display: block and a width set—by setting the horizontal margins to auto.',
-        // src
-        src:
-            'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHw%3D&w=1000&q=80',
-    },
-]
+import axios from 'axios'
 
 const SearchBar = (props) => {
     const { search, setSearch, submit } = props
@@ -99,9 +61,41 @@ export default function CreateBook() {
 
     const submit = () => {
         if (!search) return
-        const data = DUMMY_BOOK_RESULTS
-        // TODO: make gBooks API call here
-        setBooks(data)
+
+        axios
+            .get(`https://www.googleapis.com/books/v1/volumes?q=${search}`)
+            .then((response) => {
+                //console.log(response.data);
+                var length = response.data.items.length
+                let empty = []
+                var i = 0
+                for (i = 0; i < length; i++) {
+                    let booky = response.data['items'][i]['volumeInfo']
+                    let titleStr =
+                        booky['title'] !== undefined ? booky['title'] : ''
+                    let authorStr =
+                        booky['authors'] !== undefined
+                            ? booky['authors'][0]
+                            : 'no author information available'
+                    let descriptionStr =
+                        booky['description'] !== undefined
+                            ? String(booky['description']).substring(0, 300) +
+                              '...'
+                            : 'no description available'
+                    let srcStr =
+                        booky['imageLinks']['thumbnail'] !== undefined
+                            ? booky['imageLinks']['thumbnail']
+                            : ''
+
+                    empty.push({
+                        title: titleStr,
+                        author: authorStr,
+                        description: descriptionStr,
+                        src: srcStr,
+                    })
+                }
+                setBooks([...empty])
+            })
     }
     const synthesize = () => {
         // TODO: make API call here
